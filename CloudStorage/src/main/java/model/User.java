@@ -19,12 +19,12 @@ public class User {
     private int id;
 
     @Column(name="email")
-    @NotNull
+    @NotNull(message="email field should be not empty")
     @Email
     private String email;
 
     @Column(name="password")
-    @NotNull
+    @NotNull(message = "password field should not be empty")
     private String password;
 
     //field List<File> files -> user files
