@@ -27,6 +27,8 @@ public class User {
     @NotNull(message = "password field should not be empty")
     private String password;
 
+    @Column(name="role")
+    private String role;
     //field List<File> files -> user files
 
     public User()
@@ -35,6 +37,14 @@ public class User {
     public User(String email, String password) {
         this.email = email;
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public int getId() { return id;}
