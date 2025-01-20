@@ -2,6 +2,7 @@ package config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -29,7 +30,6 @@ public class SecurityConfig {
         return manager;
     }
 
-
     //TODO не работает из-за отсутствия аутетентификации здесь смотреть основу -> https://www.youtube.com/watch?v=h-9vhFeM3MY&list=PLhmKCS4rYkgPGi7n6O7AIKwOFHY9yrpIQ&index=55
     //TODO Разделить конфиг где хранится authentication provider, bcrypt etc. и на SecurityChainFilter фильтровать там входящие запросы
 
@@ -46,6 +46,7 @@ public class SecurityConfig {
                         .permitAll());
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
