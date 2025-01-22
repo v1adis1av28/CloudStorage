@@ -6,8 +6,8 @@
 </head>
 <body>
 <h1 th:inline="text">Hello <span th:remove="tag" sec:authentication="name">thymeleaf</span>!</h1>
-<form th:action="@{/logout}" method="post">
-    <input type="submit" value="Sign Out"/>
+<form th:action="@{/auth/logout}" method="post">
+    <input type="submit" value="logout"/>
 </form>
 </body>
 </html>

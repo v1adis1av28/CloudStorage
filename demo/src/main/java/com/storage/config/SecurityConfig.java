@@ -49,7 +49,7 @@ public class SecurityConfig {
             if (user.isEmpty()) {
                 throw new UsernameNotFoundException("User not found: " + username);
             }
-            return new CustomUserDetails(user.get()); // Возвращаем CustomUserDetails
+            return new CustomUserDetails(user.get());
         };
     }
 
@@ -64,9 +64,12 @@ public class SecurityConfig {
                 .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests(authRequest -> authRequest
                         .requestMatchers("/hello").hasAnyAuthority("user")
+                        .requestMatchers("/auth/register").permitAll()
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/auth/admin").hasAuthority("admin"))
-                .formLogin(form -> form.loginProcessingUrl("/auth/login").loginPage("/auth/login").successForwardUrl("/hello"));
+                .formLogin(form -> form.loginProcessingUrl("/process_login")
+                        .loginPage("/auth/login").defaultSuccessUrl("/hello").failureUrl("/auth/login?error"))
+                .logout(logout -> logout.logoutUrl("/auth/logout").permitAll().logoutSuccessUrl("/auth/login"));
         return http.build();
     }
 }

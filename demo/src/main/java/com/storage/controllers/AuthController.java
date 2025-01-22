@@ -1,42 +1,51 @@
 package com.storage.controllers;
 
+import com.storage.model.User;
 import com.storage.services.UserService;
+import com.storage.validation.UserValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
 
     private final UserService userService;
+    private final UserValidation userValidation;
 
     @Autowired
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, UserValidation userValidation) {
         this.userService = userService;
-    }
-
-    @GetMapping("/admin")
-    public String admin(Model model) {
-        return "admin";
+        this.userValidation = userValidation;
     }
 
     //TODO сделать отдельные обработчики для создания пользователя и его обычной аутентификации
-    //TODO Разобраться с переадрессацией при входе в приложение
     //TODO посмотреть как и добавить сессии при аутентификации
-    //todo добавить обработчик для logout
 
     @GetMapping("/login")
     public String login() {
         return "login";
     }
 
-    @PostMapping("/login")
-    public String loginization(@RequestParam String username, @RequestParam String password, Model model) {
-        return userService.createUser(username, password);
+    @GetMapping("/registration")
+    public String registration(@ModelAttribute("user") User user)
+    {
+        return "registration";
     }
+
+    @PostMapping("/registration")
+    public String registration(@ModelAttribute("user") User user, BindingResult result) {
+        //Валидация наличия пользователя с таким email
+        userValidation.validate(user, result);
+
+        if(result.hasErrors()) {
+            return "registration";
+        }
+        return "redirect:/hello";
+    }
+
+
 }
