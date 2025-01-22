@@ -3,6 +3,7 @@ package com.storage.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,8 @@ public class User {
     private int id;
 
     @Column(name="username", unique=true, nullable=false)
-    @Email
+    @Email(message = "email should have correct form!")
+    @NotEmpty(message="email should not be empty")
     private String username;
 
     @Column(name="password",nullable = false)

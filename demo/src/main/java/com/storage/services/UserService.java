@@ -2,6 +2,7 @@ package com.storage.services;
 
 import com.storage.repositories.UserRepository;
 import com.storage.security.CustomUserDetails;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.storage.model.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,7 +40,11 @@ public class UserService implements UserDetailsService {
                 .password(new BCryptPasswordEncoder().encode(password))
                 .role("user")
                 .build();
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        }catch (ConstraintViolationException e){
+            throw new ConstraintViolationException(e.getConstraintViolations());
+        }
         return "User created";
     }
 }

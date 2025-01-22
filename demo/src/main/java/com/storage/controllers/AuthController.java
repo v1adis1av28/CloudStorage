@@ -5,6 +5,7 @@ import com.storage.services.UserService;
 import com.storage.validation.UserValidation;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,8 +50,12 @@ public class AuthController {
         if(result.hasErrors()) {
             return "registration";
         }
-
-        userService.createUser(user.getUsername(), user.getPassword());
+        try {
+            userService.createUser(user.getUsername(), user.getPassword());
+        } catch (jakarta.validation.ConstraintViolationException e) {
+            result.rejectValue("username", "", "Invalid email format. Please provide a valid email.");
+            return "registration";
+        }
         authenticateUser(user,request);
         return "redirect:/hello";
     }
