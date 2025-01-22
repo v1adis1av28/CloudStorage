@@ -40,7 +40,7 @@ public class UserValidation implements Validator {
             return ; // Значит валидация прошла
         }
 
-        errors.rejectValue("email", "", "User with this email already exists");
+        errors.rejectValue("username", "", "User with this email already exists");
     }
 
 }

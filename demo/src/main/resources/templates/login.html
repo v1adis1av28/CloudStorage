@@ -145,9 +145,11 @@
   <div><label> Email <input type="text" placeholder="Email" name="username" id="username"/> </label></div>
   <div><label> Password <input type="password" name="password" id="password" placeholder="Password"/> </label></div>
   <button type="submit" value="Login">Login</button>
+  <a href="auth/registration">Registration</a>
   <div th:if="${param.error}" style="color: red">
     Invalid username and password.
   </div>
 </form>
+
 </body>
 </html>

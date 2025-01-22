@@ -63,8 +63,9 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests(authRequest -> authRequest
-                        .requestMatchers("/hello").hasAnyAuthority("user")
+                        .requestMatchers("/auth/registration").permitAll()
                         .requestMatchers("/auth/register").permitAll()
+                        .requestMatchers("/hello").hasAnyAuthority("user")
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/auth/admin").hasAuthority("admin"))
                 .formLogin(form -> form.loginProcessingUrl("/process_login")
