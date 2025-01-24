@@ -46,6 +46,7 @@ public class AuthController {
     public String registration(@ModelAttribute("user") User user, BindingResult result,HttpServletRequest request, Model model) throws ServletException {
         //Валидация наличия пользователя с таким email
         userValidation.validate(user, result);
+        System.out.println("Received user: " + user.getUsername() + ", " + user.getPassword()); // Логирование
 
         if(result.hasErrors()) {
             return "registration";
