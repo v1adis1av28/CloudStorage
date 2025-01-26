@@ -61,7 +61,6 @@ public class AuthController {
         return "redirect:/hello";
     }
 
-    //Todo validation on registration fields!
     private void authenticateUser(User user, HttpServletRequest request) throws ServletException {
         request.getSession().setAttribute("user", user);
         request.login(user.getUsername(),user.getPassword());
