@@ -63,15 +63,24 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests(authRequest -> authRequest
-                        .requestMatchers("/auth/registration").permitAll()
-                        .requestMatchers("/auth/register").permitAll()
+                        .requestMatchers("/auth/registration", "/auth/register", "/auth/login")
+                        .permitAll()
                         .requestMatchers("/hello").hasAnyAuthority("user")
-                        .requestMatchers("/auth/login").permitAll()
-                        .requestMatchers("/auth/admin").hasAuthority("admin"))
-                .formLogin(form -> form.loginProcessingUrl("/process_login")
-                        .loginPage("/auth/login").defaultSuccessUrl("/hello").failureUrl("/auth/login?error"))
-                .logout(logout -> logout.logoutUrl("/auth/logout").permitAll().logoutSuccessUrl("/auth/login"));
+                        .requestMatchers("/auth/admin").hasAuthority("admin")
+                        .anyRequest().authenticated())
+                .formLogin(form -> form
+                        .loginProcessingUrl("/process_login")
+                        .loginPage("/auth/login")
+                        .defaultSuccessUrl("/hello",true)
+                        .failureUrl("/auth/login?error")
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutUrl("/auth/logout")
+                        .logoutSuccessUrl("/auth/login")
+                        .permitAll());
+
         return http.build();
     }
+
 }
 
