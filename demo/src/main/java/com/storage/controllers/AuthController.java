@@ -31,7 +31,6 @@ public class AuthController {
         this.requestContextFilter = requestContextFilter;
     }
 
-    //TODO сделать отдельные обработчики для создания пользователя и его обычной аутентификации
     //TODO посмотреть как и добавить сессии при аутентификации
 
     @GetMapping("/login")
@@ -58,9 +57,8 @@ public class AuthController {
 
     @PostMapping("/register")
     public String registration(@ModelAttribute("user") User user, BindingResult result,HttpServletRequest request, Model model) throws ServletException {
-        //Валидация наличия пользователя с таким email
         userValidation.validate(user, result);
-        System.out.println("Received user: " + user.getUsername() + ", " + user.getPassword()); // Логирование
+        System.out.println("Received user: " + user.getUsername() + ", " + user.getPassword());
 
         if(result.hasErrors()) {
             return "registration";
