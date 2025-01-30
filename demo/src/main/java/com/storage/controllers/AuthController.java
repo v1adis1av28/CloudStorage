@@ -2,6 +2,7 @@ package com.storage.controllers;
 
 import com.storage.model.User;
 import com.storage.services.UserService;
+import com.storage.services.minio.FileService;
 import com.storage.validation.UserValidation;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,12 +25,13 @@ public class AuthController {
     private final UserService userService;
     private final UserValidation userValidation;
     private final RequestContextFilter requestContextFilter;
-
+    private final FileService fileService;
     @Autowired
-    public AuthController(UserService userService, UserValidation userValidation, RequestContextFilter requestContextFilter) {
+    public AuthController(UserService userService, UserValidation userValidation, RequestContextFilter requestContextFilter, FileService fileService) {
         this.userService = userService;
         this.userValidation = userValidation;
         this.requestContextFilter = requestContextFilter;
+        this.fileService = fileService;
     }
 
     //TODO посмотреть как и добавить сессии при аутентификации
@@ -41,7 +43,6 @@ public class AuthController {
         if(authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return "login";
         }
-
         return "redirect:/hello";
     }
 
@@ -77,6 +78,7 @@ public class AuthController {
             return "registration";
         }
         authenticateUser(user,request);
+        fileService.createInitialUserFolder(user.getId());
         return "redirect:/hello";
     }
 

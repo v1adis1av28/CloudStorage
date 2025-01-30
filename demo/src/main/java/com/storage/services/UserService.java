@@ -2,7 +2,7 @@ package com.storage.services;
 
 import com.storage.repositories.UserRepository;
 import com.storage.security.CustomUserDetails;
-import com.storage.services.minio.FileOperationService;
+import com.storage.services.minio.FileService;
 import io.minio.errors.*;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +24,10 @@ import java.util.Optional;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final FileOperationService fileOperationService;
+    private final FileService fileOperationService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, FileOperationService fileOperationService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, FileService fileOperationService) {
         this.userRepository = userRepository;
         this.fileOperationService = fileOperationService;
     }
@@ -48,7 +48,6 @@ public class UserService implements UserDetailsService {
                 .build();
         try {
             userRepository.save(user);
-            fileOperationService.createInitialUserFolder(user.getId());
         }catch (ConstraintViolationException e){
             throw new ConstraintViolationException(e.getConstraintViolations());
         }
