@@ -5,6 +5,7 @@ import com.storage.services.UserService;
 import com.storage.validation.UserValidation;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.SneakyThrows;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -60,6 +61,7 @@ public class AuthController {
         return "redirect:/hello";
     }
 
+    @SneakyThrows
     @PostMapping("/register")
     public String registration(@ModelAttribute("user") User user, BindingResult result,HttpServletRequest request, Model model) throws ServletException {
         userValidation.validate(user, result);
