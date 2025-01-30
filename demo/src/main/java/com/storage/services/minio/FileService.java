@@ -3,6 +3,7 @@ package com.storage.services.minio;
 
 import io.minio.*;
 import io.minio.errors.*;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,10 +50,10 @@ public class FileService {
         if (!folderPath.startsWith(userFolder)) {
             throw new IllegalArgumentException("Недопустимый путь. Файл должен находиться в " + userFolder);
         }
-
+    //  TODO что-то придумать с валидацией и составления пути к загружаемому файлу(скорее всего нужен рефактор по PATH)
         minioClient.uploadObject(
                 UploadObjectArgs.builder()
-                        .bucket(ROOT_BUCKET)//TODO что-то придумать с валидацией и составления пути к загружаемому файлу
+                        .bucket(ROOT_BUCKET)
                         .object(folderPath)// здесь задаем путь где он будет храниться после последнего слеша будет задаваться имя файла
                         .filename(localFilePath)//путь к файлу на локальном устройстве
                         .contentType(contentType)
@@ -60,9 +61,31 @@ public class FileService {
         );
     }
 
-}
+    //Сперва нужно копировать файл,
+    @SneakyThrows
+    public void renameFile(int userId, String newFileName, String oldFilePath)
+    {
+     //user-20-files/test/minioLaunch
+        String pathToFile = oldFilePath.substring(0,oldFilePath.lastIndexOf('/') + 1);
+        String oldFileName = oldFilePath.substring(oldFilePath.lastIndexOf('/') + 1);
+        minioClient.copyObject(CopyObjectArgs.builder()
+                .bucket(ROOT_BUCKET)
+                .object(pathToFile+newFileName)
+                .source(CopySource.builder()
+                .bucket(ROOT_BUCKET).object(oldFilePath).build()).build());
+        //call remove method
+        removeFile(oldFilePath);
+    }
 
-//TODO 3) Переименовывание файлов( нет такой операции, переименование папки по сути представляет собой создание папки под новым именем и перенос туда файлов, см. CopyObject)
+    @SneakyThrows
+    public void removeFile(String filePath)
+    {
+        minioClient.removeObject(RemoveObjectArgs.builder().bucket(ROOT_BUCKET).object(filePath).build());
+    }
+
+}
+// TODO 2)переименовывание файлов
+//TODO 3) Переименовывание папки( нет такой операции, переименование папки по сути представляет собой создание папки под новым именем и перенос туда файлов, см. CopyObject)
 //TODO 4) Удаление файлов
 
 
