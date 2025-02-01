@@ -1,9 +1,12 @@
 package com.storage.services.minio;
 
 
+import com.storage.utils.StringOperation;
 import io.minio.*;
 import io.minio.errors.*;
+import io.minio.messages.Item;
 import lombok.SneakyThrows;
+import org.simpleframework.xml.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 @Service
 public class FileService {
@@ -83,10 +87,61 @@ public class FileService {
         minioClient.removeObject(RemoveObjectArgs.builder().bucket(ROOT_BUCKET).object(filePath).build());
     }
 
+
+    //example
+    //user-20-files/test/some/somefolder/minioLaunch реальный полный путь в папке
+    ////user-20-files/test/some/ -- folderPath
+    //нужно сохранять полный путь до изменияемой папки, затем проходить
+    @SneakyThrows
+    public void renameFolder(int userId, String folderPath, String newFolderName) {
+        if (!folderPath.endsWith("/")) {
+            throw new IllegalArgumentException("Folder path must end with '/'");
+        }
+
+        String parentFolderPath = StringOperation.trimFolderPath(folderPath);
+
+        String newFolderPath = parentFolderPath + newFolderName + "/";
+
+        Iterable<Result<Item>> results = minioClient.listObjects(
+                ListObjectsArgs.builder()
+                        .bucket(ROOT_BUCKET)
+                        .prefix(folderPath)
+                        .recursive(true)
+                        .build());
+
+        for (Result<Item> result : results) {
+            Item item = result.get();
+            String itemName = item.objectName();
+
+            String newObjectPath = newFolderPath + itemName.substring(folderPath.length());
+
+            minioClient.copyObject(
+                    CopyObjectArgs.builder()
+                            .bucket(ROOT_BUCKET)
+                            .object(newObjectPath)
+                            .source(CopySource.builder()
+                                    .bucket(ROOT_BUCKET)
+                                    .object(itemName)
+                                    .build())
+                            .build());
+
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket(ROOT_BUCKET)
+                            .object(itemName)
+                            .build());
+        }
+
+        minioClient.putObject(
+                PutObjectArgs.builder()
+                        .bucket(ROOT_BUCKET)
+                        .object(newFolderPath)
+                        .stream(new ByteArrayInputStream(new byte[]{}), 0, -1)
+                        .build());
+    }
+
 }
-// TODO 2)переименовывание файлов
-//TODO 3) Переименовывание папки( нет такой операции, переименование папки по сути представляет собой создание папки под новым именем и перенос туда файлов, см. CopyObject)
-//TODO 4) Удаление файлов
+//TODO 4) Удаление файлов(удаление папок)
 
 
 
