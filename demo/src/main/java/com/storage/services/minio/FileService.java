@@ -6,14 +6,17 @@ import io.minio.*;
 import io.minio.errors.*;
 import io.minio.messages.Item;
 import lombok.SneakyThrows;
+import org.checkerframework.checker.units.qual.A;
 import org.simpleframework.xml.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -54,7 +57,6 @@ public class FileService {
         if (!folderPath.startsWith(userFolder)) {
             throw new IllegalArgumentException("Недопустимый путь. Файл должен находиться в " + userFolder);
         }
-    //  TODO что-то придумать с валидацией и составления пути к загружаемому файлу(скорее всего нужен рефактор по PATH)
         minioClient.uploadObject(
                 UploadObjectArgs.builder()
                         .bucket(ROOT_BUCKET)
@@ -64,6 +66,7 @@ public class FileService {
                         .build()
         );
     }
+
 
     //Сперва нужно копировать файл,
     @SneakyThrows
@@ -88,12 +91,37 @@ public class FileService {
     }
 
 
-    //example
-    //user-20-files/test/some/somefolder/minioLaunch реальный полный путь в папке
-    ////user-20-files/test/some/ -- folderPath
-    //нужно сохранять полный путь до изменияемой папки, затем проходить
+    //user-20-files/test/
     @SneakyThrows
-    public void renameFolder(int userId, String folderPath, String newFolderName) {
+    public void removeFolder(String folderPath)
+    {
+        if(!folderPath.endsWith("/"))
+        {
+            throw new IllegalArgumentException("folder path must end with /");
+        }
+
+        ArrayList<String> itemsToDelete = new ArrayList<>();
+        Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder()
+                .bucket(ROOT_BUCKET).prefix(folderPath)
+                .recursive(true).build());
+
+        for(Result<Item> result : results)
+        {
+            itemsToDelete.add(result.get().objectName());
+            System.out.println(result.get().objectName());
+        }
+
+        for(String item : itemsToDelete)
+        {
+            System.out.println(item);
+            removeFile(item);
+            System.out.println("delete file named -> " + item);
+        }
+
+    }
+
+    @SneakyThrows
+    public void renameFolder(String folderPath, String newFolderName) {
         if (!folderPath.endsWith("/")) {
             throw new IllegalArgumentException("Folder path must end with '/'");
         }
@@ -141,65 +169,3 @@ public class FileService {
     }
 
 }
-//TODO 4) Удаление файлов(удаление папок)
-
-
-
-
-//Проверка наличия бакета с определенным именем + создание
-//         boolean checkBucketExist = client.bucketExists(BucketExistsArgs.builder().bucket("test").build());
-//                if(checkBucketExist) {
-//                    System.out.println("такой бакет уже существует переименую или хз выруби комп");
-//                }
-//                else
-//                {
-//client.makeBucket(MakeBucketArgs.builder().bucket("test").bucket("inner").build()); // создание бакета
-//        }
-//        MinioClient client = MinioClient.builder().endpoint("http://127.0.0.1:9000")
-//                .credentials("minioadmin","minioadmin").build();
-//        String bucketName = "user-1-bucket"; // Имя бакета
-//        String userFolder = "user-1-files/"; // Папка пользователя
-//        String userSubFolder = userFolder + "myfolder/"; // Подпапка пользователя
-//        String filePath = "G:\\CloudStorage\\demo\\src\\main\\resources\\minioLaunch.txt"; // Путь к файлу на локальной машине
-//        String objectName = userSubFolder + "myfile.txt"; // Имя объекта в MinIO
-//
-//        // Проверяем, существует ли бакет, и создаем его, если нет
-//        boolean isExist = client.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
-//        if (!isExist) {
-//            client.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-//        }
-//
-//        // Загружаем файл в папку пользователя
-//        client.uploadObject(
-//                UploadObjectArgs.builder()
-//                        .bucket(bucketName)
-//                        .object(objectName)
-//                        .filename(filePath)
-//                        .build());
-//
-//        System.out.println("File uploaded successfully to: " + objectName);
-//        return;
-//    }
-
-//полуение инфы о всех бакетах
-//public List<Bucket> listBuckets() [Javadoc]
-//Lists bucket information of all buckets.
-
-//Список объектов в бакете
-//Iterable<Result<Item>> results = client.listObjects(
-//        ListObjectsArgs.builder().bucket("test").build());
-//Item item = results.iterator().next().get();
-//        System.out.println(item.objectName());
-
-
-//Копирование объекта сперва указываем куда и как назоваем -> потом откуда и что
-// client.copyObject(CopyObjectArgs.builder().bucket("user-files").object("zapuskTxtcop.txt")
-//                .source(CopySource.builder().bucket("test").object("zapuskTxt.txt").build()).build());
-//
-
-
-//Загрузка файлов закинул файл в корневую папку прроекта наврное можно задать путь для установки
-//client.downloadObject(DownloadObjectArgs.builder().bucket("user-files").object("zapuskTxt.txt").filename("testDownload").build());
-
-//Удаление файла из бакета
-//client.removeObject(RemoveObjectArgs.builder().bucket("test").object("zapuskTxt.txt").build());

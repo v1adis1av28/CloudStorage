@@ -29,11 +29,11 @@ public class HelloController {
     public String index() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails user = (CustomUserDetails) userService.loadUserByUsername(auth.getName());
-        //fileService.uploadFile(user.getUser().getId(),"user-20-files/test/minioLaunch","G:\\CloudStorage\\demo\\src\\main\\resources\\minioLaunch.txt","text/plain");
         //fileService.renameFile(user.getUser().getId(),"miniolaunnch123","user-20-files/test/minioLaunch");
         //fileService.removeFile("user-files/user-20-files/test/");
-        fileService.renameFolder(user.getUser().getId(),"user-20-files/test/","newfoldername");
-
+        //fileService.renameFolder("user-20-files/test/","newfoldername");
+        //fileService.uploadFileTest(user.getUser().getId(),"user-20-files/test/minioLaunch","G:\\CloudStorage\\demo\\src\\main\\resources\\minioLaunch.txt","text/plain");
+        //fileService.removeFolder("user-20-files/test/test/");
         return "home";
     }
 
