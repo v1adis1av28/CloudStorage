@@ -3,9 +3,29 @@
       xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
     <title>Hello World!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/css/fileLoad.css">
 </head>
 <body>
 <h1 th:inline="text">Hello <span th:remove="tag" sec:authentication="name">thymeleaf</span>!</h1>
+
+<form method="post" th:action="@{/uploadFile}" enctype="multipart/form-data">
+    <div class="drop-zone">
+        <span class="drop-zone__prompt">Drop file here or click to upload</span>
+        <input type="file" name="file" accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,.jpeg,.png" class="drop-zone__input">
+    </div>
+
+    <div th:if="${error}" style="color: red;">
+        <p th:text="${error}">Error message</p>
+    </div>
+
+
+    <button type="submit">Загрузить</button>
+</form>
+
+<script src="/js/dragNdrop.js"></script>
+
 <form th:action="@{/auth/logout}" method="post">
     <input type="submit" value="logout"/>
 </form>
