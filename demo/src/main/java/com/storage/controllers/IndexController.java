@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 @Controller
 public class IndexController {
@@ -43,6 +44,8 @@ public class IndexController {
         return "home";
     }
 
+
+    //TODO добавить контроллер ответственный за загрузку данных(перенести туда uploadFile,uploadFolder)
     @PostMapping("/uploadFile")
     public String uploadFile(@RequestParam("file") MultipartFile file, Model model) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
 
@@ -59,6 +62,24 @@ public class IndexController {
         }
         return "home";
     }
+
+    @PostMapping("/uploadFolder")
+    public String uploadFolder(@RequestParam("files") MultipartFile[] files,
+                               Model model) throws Exception {
+        if (files.length == 0) {
+            model.addAttribute("error", "Folder is empty");
+            return "home";
+        }
+        try {
+            fileService.uploadFolder(getCurrentUser().getUser().getId(), "testUploadFolder/", files);
+        } catch (IllegalArgumentException exception) {
+            model.addAttribute("error", exception.getMessage());
+            return "home";
+        }
+        return "home";
+    }
+
+
 
 
     private CustomUserDetails getCurrentUser() {

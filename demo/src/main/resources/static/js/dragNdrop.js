@@ -7,7 +7,7 @@ document.querySelectorAll(".drop-zone__input").forEach((inputElement) => {
 
     inputElement.addEventListener("change", (e) => {
         if (inputElement.files.length) {
-            updateThumbnail(dropZoneElement, inputElement.files[0]);
+            updateThumbnail(dropZoneElement, inputElement.files);
         }
     });
 
@@ -27,14 +27,14 @@ document.querySelectorAll(".drop-zone__input").forEach((inputElement) => {
 
         if (e.dataTransfer.files.length) {
             inputElement.files = e.dataTransfer.files;
-            updateThumbnail(dropZoneElement, e.dataTransfer.files[0]);
+            updateThumbnail(dropZoneElement, e.dataTransfer.files);
         }
 
         dropZoneElement.classList.remove("drop-zone--over");
     });
 });
 
-function updateThumbnail(dropZoneElement, file) {
+function updateThumbnail(dropZoneElement, files) {
     let thumbnailElement = dropZoneElement.querySelector(".drop-zone__thumb");
 
     if (dropZoneElement.querySelector(".drop-zone__prompt")) {
@@ -47,12 +47,19 @@ function updateThumbnail(dropZoneElement, file) {
         dropZoneElement.appendChild(thumbnailElement);
     }
 
-    thumbnailElement.dataset.label = file.name;
+    // Отображаем информацию о папке
+    thumbnailElement.innerHTML = `
+        <div class="folder-info">
+            <strong>Folder Name:</strong> ${files[0].webkitRelativePath.split('/')[0]}<br>
+            <strong>Files:</strong> ${files.length}
+        </div>
+    `;
 
-    if (file.type.startsWith("image/")) {
+    // Если есть изображения, отображаем первое из них
+    const imageFiles = Array.from(files).filter(file => file.type.startsWith("image/"));
+    if (imageFiles.length > 0) {
         const reader = new FileReader();
-
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(imageFiles[0]);
         reader.onload = () => {
             thumbnailElement.style.backgroundImage = `url('${reader.result}')`;
         };

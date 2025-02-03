@@ -1,33 +1,46 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
 <head>
-    <title>Hello World!</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Загрузка файлов и папок</title>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/fileLoad.css">
 </head>
 <body>
-<h1 th:inline="text">Hello <span th:remove="tag" sec:authentication="name">thymeleaf</span>!</h1>
 
+<h1>Загрузка файлов и папок</h1>
+
+<!-- Форма загрузки файла -->
 <form method="post" th:action="@{/uploadFile}" enctype="multipart/form-data">
     <div class="drop-zone">
-        <span class="drop-zone__prompt">Drop file here or click to upload</span>
-        <input type="file" name="file" accept=".doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,.jpeg,.png" class="drop-zone__input">
+        <span class="drop-zone__prompt">Перетащите файл или нажмите для загрузки</span>
+        <input type="file" name="file" accept=".doc,.docx,.pdf,.jpeg,.png" class="drop-zone__input">
     </div>
 
     <div th:if="${error}" style="color: red;">
-        <p th:text="${error}">Error message</p>
+        <p th:text="${error}">Ошибка</p>
     </div>
 
+    <button type="submit">Загрузить файл</button>
+</form>
 
-    <button type="submit">Загрузить</button>
+<!-- Форма загрузки папки -->
+<form id="upload-folder-form" method="post" th:action="@{/uploadFolder}" enctype="multipart/form-data">
+    <div class="drop-zone">
+        <span class="drop-zone__prompt">Перетащите папку или нажмите для загрузки</span>
+        <input type="file" id="folder-input" name="files" webkitdirectory directory multiple accept=".doc,.docx,.pdf,.jpeg,.png" class="drop-zone__input">
+    </div>
+
+    <div id="folder-error" style="color: red;"></div>
+
+    <button type="submit" id="upload-folder-btn">Загрузить папку</button>
 </form>
 
 <script src="/js/dragNdrop.js"></script>
 
 <form th:action="@{/auth/logout}" method="post">
-    <input type="submit" value="logout"/>
+    <input type="submit" value="Выйти">
 </form>
+
 </body>
 </html>

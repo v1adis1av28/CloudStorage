@@ -10,6 +10,7 @@ import org.checkerframework.checker.units.qual.A;
 import org.simpleframework.xml.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,7 +28,6 @@ import java.util.List;
 public class FileService {
 
     private String ROOT_BUCKET = "user-files";
-    private final String USER_FOLDER_PATH = "user-%d-files/";
     private final MinioClient minioClient;
 
     @Autowired
@@ -39,13 +39,14 @@ public class FileService {
     //private String userBucket = String.format("user-%d-files",);
     public void createInitialUserFolder(int userId) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         boolean checkBucketExist = minioClient.bucketExists(BucketExistsArgs.builder().bucket(ROOT_BUCKET).build());
+        String userFolder = "user-" + userId + "-files/";
         if (checkBucketExist) {
             System.out.println("Bucket with that name already exists!");
         } else {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(ROOT_BUCKET).build());
         }
         minioClient.putObject(PutObjectArgs.builder()
-                .bucket(ROOT_BUCKET).object(String.format(USER_FOLDER_PATH, userId))
+                .bucket(ROOT_BUCKET).object(userFolder)
                 .stream(new ByteArrayInputStream(new byte[]{}), 0, -1)
                 .build());
     }
@@ -91,6 +92,28 @@ public class FileService {
         Files.deleteIfExists(tempFile);
     }
 
+
+    public void uploadFolder(int userId, String folderPath, MultipartFile[] files) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        String userFolder = "user-" + userId + "-files/";
+
+        if(folderPath == null || folderPath.isEmpty()) {
+            throw new IllegalArgumentException("folderPath is empty");
+        }
+
+        for (MultipartFile file : files) {
+            String filename = file.getOriginalFilename();
+            String objectPath = userFolder + folderPath + filename;
+
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(ROOT_BUCKET)
+                            .object(objectPath)
+                            .stream(file.getInputStream(), file.getSize(), -1)
+                            .contentType(file.getContentType())
+                            .build()
+            );
+        }
+    }
 
     //Сперва нужно копировать файл,
     @SneakyThrows
