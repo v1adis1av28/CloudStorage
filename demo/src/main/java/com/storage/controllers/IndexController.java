@@ -35,12 +35,13 @@ public class IndexController {
 
     @SneakyThrows
     @GetMapping("/hello")
-    public String index() {
+    public String index(Model model) {
         //fileService.renameFile(user.getUser().getId(),"miniolaunnch123","user-20-files/test/minioLaunch");
         //fileService.removeFile("user-files/user-20-files/test/");
         //fileService.renameFolder("user-20-files/test/","newfoldername");
         //fileService.uploadFileTest(user.getUser().getId(),"user-20-files/test/minioLaunch","G:\\CloudStorage\\demo\\src\\main\\resources\\minioLaunch.txt","text/plain");
         //fileService.removeFolder("user-20-files/test/test/");
+        model.addAttribute("User", getCurrentUser().getUser());
         return "home";
     }
 
