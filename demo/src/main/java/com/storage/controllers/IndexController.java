@@ -25,11 +25,9 @@ import java.util.List;
 @Controller
 public class IndexController {
 
-    private final FileService fileService;
     private final UserService userService;
     @Autowired
-    public IndexController(FileService fileService, UserService userService) {
-        this.fileService = fileService;
+    public IndexController(UserService userService) {
         this.userService = userService;
     }
 
@@ -45,42 +43,9 @@ public class IndexController {
         return "home";
     }
 
-
-    //TODO добавить контроллер ответственный за загрузку данных(перенести туда uploadFile,uploadFolder)
-    @PostMapping("/uploadFile")
-    public String uploadFile(@RequestParam("file") MultipartFile file, Model model) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-
-        if(file.isEmpty()) {
-            model.addAttribute("error", "File is empty");
-            return "home";
-        }
-
-        try {fileService.uploadFile(getCurrentUser().getUser().getId(),"testUpload/", file.getInputStream(),file.getResource().getFilename(),file.getContentType());}
-        catch (IllegalArgumentException exception)
-        {
-            model.addAttribute("error", exception.getMessage());
-            return "home";
-        }
-        return "home";
-    }
-
-    @PostMapping("/uploadFolder")
-    public String uploadFolder(@RequestParam("files") MultipartFile[] files,
-                               Model model) throws Exception {
-        if (files.length == 0) {
-            model.addAttribute("error", "Folder is empty");
-            return "home";
-        }
-        try {
-            fileService.uploadFolder(getCurrentUser().getUser().getId(), "testUploadFolder/", files);
-        } catch (IllegalArgumentException exception) {
-            model.addAttribute("error", exception.getMessage());
-            return "home";
-        }
-        return "home";
-    }
-
-
+    //TODO Адрес - /?path=$path_to_subdirectory. Параметр $path задаёт путь просматриваемой папки. Если параметр отсутствует, подразумевается корневая папка. Пример - /path=Projects%2FJava%2FCloudFileStorage (параметр закодирован через URL Encode)
+    //TODO добавить отображение в блок файлов всех файлов пользователя по его id
+    //TODO добавить в карточку(предположительно так будет отображатсья файл\папка) кнопку удаления/переименовывания(создание контроллера отвечающего за изменение файлов)
 
 
     private CustomUserDetails getCurrentUser() {
