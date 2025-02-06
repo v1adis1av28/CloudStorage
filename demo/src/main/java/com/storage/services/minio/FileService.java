@@ -1,38 +1,41 @@
 package com.storage.services.minio;
 
 
-import com.storage.utils.StringOperation;
+import com.storage.dto.FileInfoDto;
+import com.storage.services.DTOService;
+import com.storage.services.StringOperation;
 import io.minio.*;
 import io.minio.errors.*;
 import io.minio.messages.Item;
 import lombok.SneakyThrows;
-import org.checkerframework.checker.units.qual.A;
-import org.simpleframework.xml.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
 @Service
 public class FileService {
 
     private String ROOT_BUCKET = "user-files";
     private final MinioClient minioClient;
-
+    private final StringOperation stringOperation;
+    private final DTOService dtoService;
     @Autowired
-    public FileService(MinioClient minioClient) {
+    public FileService(MinioClient minioClient, StringOperation stringOperation, DTOService dtoService) {
         this.minioClient = minioClient;
+        this.stringOperation = stringOperation;
+        this.dtoService = dtoService;
     }
 
     //функция инициализирующая папку для пользователя
@@ -167,7 +170,7 @@ public class FileService {
             throw new IllegalArgumentException("Folder path must end with '/'");
         }
 
-        String parentFolderPath = StringOperation.trimFolderPath(folderPath);
+        String parentFolderPath = stringOperation.trimFolderPath(folderPath);
 
         String newFolderPath = parentFolderPath + newFolderName + "/";
 
@@ -209,4 +212,13 @@ public class FileService {
                         .build());
     }
 
+    public ArrayList<FileInfoDto> getFolderObjects(String userRootFolder) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder().bucket(ROOT_BUCKET).recursive(true).prefix(userRootFolder).build());
+        ArrayList<String> arr = new ArrayList<>();
+        for (Result<Item> result : results) {
+            arr.add(result.get().objectName());
+        }
+        HashSet<String> tmp = stringOperation.getFileAndFolders(userRootFolder,arr);
+        return dtoService.convertPathToFileInfoDto(tmp);
+    }
 }

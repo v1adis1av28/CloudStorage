@@ -3,6 +3,7 @@ package com.storage.controllers;
 import com.storage.security.CustomUserDetails;
 import com.storage.services.UserService;
 import com.storage.services.minio.FileService;
+import io.minio.MinioClient;
 import io.minio.errors.*;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,21 +26,36 @@ import java.util.List;
 @Controller
 public class IndexController {
 
+    private final FileService fileService;
     private final UserService userService;
+    private final String userRootFolder = "user-%d-files/";
+
     @Autowired
-    public IndexController(UserService userService) {
+    public IndexController(FileService fileService, UserService userService) {
+        this.fileService = fileService;
         this.userService = userService;
     }
 
+    //Plan:
+    //1) Параметризировать контроллер задавая корневую папку клиента
+    //2) Передавать этот параметр в файлсервис, от туда получать файлы/папки из параметра
+    //3) Передаем на фронт данные(пока только отображаем название файла\папки в виде карточки)
+    //4) Передаем текущую директорию для отображения тоже в виде ссылки
+    //
+    //
+
     @SneakyThrows
-    @GetMapping("/hello")
-    public String index(Model model) {
-        //fileService.renameFile(user.getUser().getId(),"miniolaunnch123","user-20-files/test/minioLaunch");
-        //fileService.removeFile("user-files/user-20-files/test/");
-        //fileService.renameFolder("user-20-files/test/","newfoldername");
-        //fileService.uploadFileTest(user.getUser().getId(),"user-20-files/test/minioLaunch","G:\\CloudStorage\\demo\\src\\main\\resources\\minioLaunch.txt","text/plain");
-        //fileService.removeFolder("user-20-files/test/test/");
+    @GetMapping(value = "/hello")
+    public String index(@RequestParam(value = "path", required = false) String path,Model model) {
         model.addAttribute("User", getCurrentUser().getUser());
+        if(path != null) {
+            model.addAttribute("path", path);
+            model.addAttribute("files", fileService.getFolderObjects(path));
+        }
+        else
+        {
+            model.addAttribute("files",fileService.getFolderObjects(String.format(userRootFolder, getCurrentUser().getUser().getId())));
+        }
         return "home";
     }
 
