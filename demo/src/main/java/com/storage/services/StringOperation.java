@@ -40,7 +40,11 @@ public class StringOperation {
             }
             else
             {
-                results.add(path.substring(0, path.indexOf("/",rootPath.length()+1)+1));
+                String folderPath = path.substring(0, path.indexOf("/",rootPath.length()+1)+1);
+                if(!folderPath.isEmpty())
+                {
+                    results.add(folderPath);
+                }
             }
         }
         for(String res : results)

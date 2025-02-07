@@ -206,16 +206,28 @@
         </div>
         <!-- Main Section -->
         <div class="col-md-10 main-content">
-            <h2>Файлы(скоро здесь breadcrumb будет)</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li th:each="link : ${chain}" class="breadcrumb-item" th:classappend="${link.getParentReference() == currentPath} ? 'active' : ''">
+                        <!-- Deactivate link if it matches the current path -->
+                        <span th:if="${link.getParentReference() == currentPath}" th:text="${link.getName()}"></span>
+
+                        <!-- Render as a link if it does not match the current path -->
+                        <a th:if="${link.getParentReference() != currentPath}"
+                           th:href="@{/hello(path=${link.getParentReference()})}"
+                           th:text="${link.getName()}"></a>
+                    </li>
+                </ol>
+            </nav>
             <div class="row justify-content-center">
                 <div th:each="file : ${files}" class="col-md-3 col-sm-6">
                     <div class="card">
                         <div>
-                            <div th:if="${file.getFullPath().endsWith('/')}" class="icon-folder">
+                            <a th:href="@{/hello(path=${currentPath == '' ? file.getFullPath() : currentPath + file.getShortName()})}">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-folder" viewBox="0 0 16 16">
                                     <path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a2 2 0 0 1 .342-1.31z"/>
                                 </svg>
-                            </div>
+                            </a>
                             <div th:unless="${file.getFullPath().endsWith('/')}" class="icon-file">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-file-earmark" viewBox="0 0 16 16">
                                     <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5z"/>

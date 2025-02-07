@@ -3,6 +3,7 @@ package com.storage.controllers;
 import com.storage.security.CustomUserDetails;
 import com.storage.services.UserService;
 import com.storage.services.minio.FileService;
+import com.storage.utils.BreadcrumbsHandle;
 import io.minio.MinioClient;
 import io.minio.errors.*;
 import lombok.SneakyThrows;
@@ -35,36 +36,42 @@ public class IndexController {
         this.fileService = fileService;
         this.userService = userService;
     }
-
-
     //Todo
     //  ** добавить эксепшен для поиска несуществующей директории
-    // 3) разобраться с breadcrumbs(что придумал -> передаем при заходе стандартный путь в качестве параметра
-    // модели, далле если переходим по директории передаем в модель шорт нейм папки или что то придумать с разделением)
-    // 4) добавить ссылку при нажатии на карточку с папкой(должен обнавляться путь)
     // 5) Переименовывание файла
     // 6) Переименовывание папки
     // 7) посмотреть загрузку папок(вроде не работает загрузка пустой)
+    // 8) чот пофиксить с файлами в которые не должен заходить(наверное что то с расширением)
 
     @SneakyThrows
     @GetMapping(value = "/hello")
-    public String index(@RequestParam(value = "path", required = false) String path,Model model) {
-        model.addAttribute("User", getCurrentUser().getUser());
-        if(path != null) {
+    public String index(@RequestParam(value = "path", required = false) String path, Model model) {
+        if (path != null && path.startsWith("/")) {
+            path = path.substring(1);
+        }
+
+        String currentPath = (path == null || path.isEmpty()) ? "" : path;
+
+        if (path != null) {
+            model.addAttribute("chain", BreadcrumbsHandle.createBreadcrumbsByPath(path));
             model.addAttribute("path", path);
             model.addAttribute("files", fileService.getFolderObjects(path));
+        } else {
+            String userRoot = String.format(userRootFolder, getCurrentUser().getUser().getId());
+            model.addAttribute("chain", BreadcrumbsHandle.createBreadcrumbsByPath(userRoot));
+            model.addAttribute("files", fileService.getFolderObjects(userRoot));
         }
-        else
-        {
-            model.addAttribute("files",fileService.getFolderObjects(String.format(userRootFolder, getCurrentUser().getUser().getId())));
-        }
+
+        model.addAttribute("currentPath", currentPath);
+        model.addAttribute("User", getCurrentUser().getUser());
         return "home";
     }
 
-
+    //Требуется перенос в userservice
     private CustomUserDetails getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails user = (CustomUserDetails) userService.loadUserByUsername(auth.getName());
         return user;
     }
+
 }
