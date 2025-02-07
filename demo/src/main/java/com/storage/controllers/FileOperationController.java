@@ -26,18 +26,19 @@ public class FileOperationController {
     }
 
     @PostMapping("/deleteFile")
-    public String deleteFile(@RequestParam("fullPath") String path) throws PermissionDeniedException {
+    public String deleteFile(@RequestParam("fullPath") String fullPath) throws PermissionDeniedException {
+        if (!fullPath.contains(String.format(userRoot, getCurrentUser().getUser().getId()))) {
+            throw new PermissionDeniedException("You don't have access to manage files");
+        }
 
-        if(path.contains(String.format(userRoot, getCurrentUser().getUser().getId())))
-        {
-           fileService.removeFile(path);
+        fileService.removeFile(fullPath);
+
+        String directoryPath = fullPath.substring(0, fullPath.lastIndexOf('/'));
+        if (directoryPath.isEmpty()) {
+            directoryPath = String.format(userRoot, getCurrentUser().getUser().getId());
         }
-        else
-        {
-            //обработка случая удаления файлов из не своей папки
-            throw new PermissionDeniedException("You dont have acces to manage files");
-        }
-        return "redirect:/hello";
+
+        return "redirect:/hello?path=" + directoryPath + "/";
     }
     private CustomUserDetails getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
