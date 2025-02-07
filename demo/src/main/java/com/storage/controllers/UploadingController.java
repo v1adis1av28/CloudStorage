@@ -37,16 +37,16 @@ public class UploadingController {
 
         if(file.isEmpty()) {
             model.addAttribute("error", "File is empty");
-            return "home";
+            return "redirect:/hello";
         }
 
-        try {fileService.uploadFile(getCurrentUser().getUser().getId(),"testUpload/", file.getInputStream(),file.getResource().getFilename(),file.getContentType());}
+        try {fileService.uploadFile(getCurrentUser().getUser().getId(),"", file.getInputStream(),file.getResource().getFilename(),file.getContentType());}
         catch (IllegalArgumentException exception)
         {
             model.addAttribute("error", exception.getMessage());
-            return "home";
+            return "redirect:/hello";
         }
-        return "home";
+        return "redirect:/hello";
     }
 
     @PostMapping("/uploadFolder")
@@ -54,15 +54,15 @@ public class UploadingController {
                                Model model) throws Exception {
         if (files.length == 0) {
             model.addAttribute("error", "Folder is empty");
-            return "home";
+            return "redirect:/hello";
         }
         try {
             fileService.uploadFolder(getCurrentUser().getUser().getId(), "testUploadFolder/", files);
         } catch (IllegalArgumentException exception) {
             model.addAttribute("error", exception.getMessage());
-            return "home";
+            return "redirect:/hello";
         }
-        return "home";
+        return "redirect:/hello";
     }
 
     private CustomUserDetails getCurrentUser() {
