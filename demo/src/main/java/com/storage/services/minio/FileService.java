@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -37,9 +36,7 @@ public class FileService {
         this.stringOperation = stringOperation;
         this.dtoService = dtoService;
     }
-
-    //функция инициализирующая папку для пользователя
-    //private String userBucket = String.format("user-%d-files",);
+    
     public void createInitialUserFolder(int userId) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         boolean checkBucketExist = minioClient.bucketExists(BucketExistsArgs.builder().bucket(ROOT_BUCKET).build());
         String userFolder = "user-" + userId + "-files/";

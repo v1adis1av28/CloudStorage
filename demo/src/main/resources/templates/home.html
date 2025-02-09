@@ -223,45 +223,92 @@
                 <div th:each="file : ${files}" class="col-md-3 col-sm-6">
                     <div class="card">
                         <div>
-                            <a th:href="@{/hello(path=${currentPath == '' ? file.getFullPath() : currentPath + file.getShortName()})}">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-folder" viewBox="0 0 16 16">
-                                    <path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a2 2 0 0 1 .342-1.31z"/>
-                                </svg>
-                            </a>
-                            <div th:unless="${file.getFullPath().endsWith('/')}" class="icon-file">
+                            <div th:if="${file.getFullPath().endsWith('/')}">
+                                <a th:href="@{/hello(path=${currentPath == '' ? file.getFullPath() : currentPath + file.getShortName()})}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-folder" viewBox="0 0 16 16">
+                                        <path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a2 2 0 0 1 .342-1.31z"/>
+                                    </svg>
+                                </a>
+                            </div>
+
+                            <!-- File Icon (Only for Files) -->
+                            <div th:unless="${file.getFullPath().endsWith('/')}">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-file-earmark" viewBox="0 0 16 16">
                                     <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5z"/>
                                 </svg>
                             </div>
                         </div>
+
                         <h4 th:text="${file.getShortName()}" class="card-title">Имя файла</h4>
                         <p th:text="${file.getFullPath()}" class="card-text">Путь к файлу</p>
+
                         <div class="d-flex justify-content-around">
+                            <div th:if="${!file.getFullPath().endsWith('/')}" class="icon-folder">
+                                <form th:action="@{/deleteFile}" method="post">
+                                    <input type="hidden" name="fullPath" th:value="${file.getFullPath()}"/>
+                                    <button type="submit" class="btn btn-danger">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                            <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
 
-                                <div th:if="${!file.getFullPath().endsWith('/')}" class="icon-folder">
-                                    <form th:action="@{/deleteFile}" method="post">
-                                        <input type="hidden" name="fullPath" th:value="${file.getFullPath()}"/>
-                                        <button type="submit" class="btn btn-danger">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                                                <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5"/>
-                                            </svg>
-                                        </button>
-                                    </form>
-                                </div>
-
-                            <a href="#" class="btn btn-primary">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
-                                    <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
-                                </svg>
-                            </a>
+                            <div th:if="${!file.getFullPath().endsWith('/')}" class="icon-folder">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#renameModal"
+                                        th:attr="data-full-path=${file.getFullPath()}, data-short-name=${file.getShortName()}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                        <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="renameModalLabel">Переименовать файл</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form id="renameForm" th:action="@{/renameFile}" method="post">
+                                    <div class="modal-body">
+                                        <input type="hidden" id="fullPath" name="fullPath" value=""/>
+                                        <label for="newName" class="form-label">Новое имя:</label>
+                                        <input type="text" class="form-control" id="newName" name="newName" required/>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                        <button type="submit" class="btn btn-primary">Переименовать</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        // JavaScript to populate modal fields
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const renameModal = document.getElementById('renameModal');
+                            renameModal.addEventListener('show.bs.modal', function (event) {
+                                const button = event.relatedTarget; // Button that triggered the modal
+                                const fullPath = button.getAttribute('data-full-path'); // Get full path from button attribute
+                                const shortName = button.getAttribute('data-short-name'); // Get short name from button attribute
+
+                                // Populate modal fields
+                                const fullPathInput = renameModal.querySelector('#fullPath');
+                                const newNameInput = renameModal.querySelector('#newName');
+
+                                fullPathInput.value = fullPath; // Set full path in hidden input
+                                newNameInput.value = shortName; // Pre-fill new name with current file name
+                            });
+                        });
+                    </script>
                 </div>
             </div>
-                <!-- Upload Forms Container -->
                 <div class="col-12">
                     <div class="upload-container">
-                        <!-- File Upload Form -->
                         <form method="post" th:action="@{/uploadFile}" enctype="multipart/form-data" class="upload-form">
                             <div class="drop-zone file-drop-zone">
                                 <span class="drop-zone__prompt">Перетащите файл или нажмите для загрузки</span>
@@ -269,7 +316,6 @@
                             </div>
                             <button type="submit" class="btn btn-primary upload-button">Загрузить файл</button>
                         </form>
-                        <!-- Folder Upload Form -->
                         <form method="post" th:action="@{/uploadFolder}" enctype="multipart/form-data" class="upload-form">
                             <div class="drop-zone folder-drop-zone">
                                 <span class="drop-zone__prompt">Перетащите папку или нажмите для загрузки</span>

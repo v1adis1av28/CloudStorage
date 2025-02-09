@@ -1,10 +1,5 @@
 package com.storage.model;
-
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-//Предпологаемая структура-> короткое имя файла,полный путь до файла, родитель файла, размер файла, мб расширение файла* если файл или указывать папка это или файл для упрощения отображения
 
 @Data
 public class FileInfo {
