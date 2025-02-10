@@ -24,13 +24,11 @@ public class AuthController {
 
     private final UserService userService;
     private final UserValidation userValidation;
-    private final RequestContextFilter requestContextFilter;
     private final FileService fileService;
     @Autowired
-    public AuthController(UserService userService, UserValidation userValidation, RequestContextFilter requestContextFilter, FileService fileService) {
+    public AuthController(UserService userService, UserValidation userValidation,  FileService fileService) {
         this.userService = userService;
         this.userValidation = userValidation;
-        this.requestContextFilter = requestContextFilter;
         this.fileService = fileService;
     }
 

@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,13 +52,15 @@ public class UploadingController {
 
     @PostMapping("/uploadFolder")
     public String uploadFolder(@RequestParam("files") MultipartFile[] files,
-                               Model model) throws Exception {
+                               Model model
+    ) throws Exception {
+        ;
         if (files.length == 0) {
             model.addAttribute("error", "Folder is empty");
             return "redirect:/hello";
         }
         try {
-            fileService.uploadFolder(getCurrentUser().getUser().getId(), "testUploadFolder/", files);
+            fileService.uploadFolder(getCurrentUser().getUser().getId(), "", files);
         } catch (IllegalArgumentException exception) {
             model.addAttribute("error", exception.getMessage());
             return "redirect:/hello";

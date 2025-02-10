@@ -1,4 +1,4 @@
-.\minio.exe server C:\minio --console-address :9001 -- запуск сервера
+    .\minio.exe server C:\minio --console-address :9001 -- запуск сервера
 
 http://127.0.0.1:9001 -- адресс по которому будет работать
 

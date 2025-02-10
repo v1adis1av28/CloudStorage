@@ -37,9 +37,8 @@ public class UserValidation implements Validator {
             userService.loadUserByUsername(user.getUsername());
         } catch(UsernameNotFoundException e)
         {
-            return ; // Значит валидация прошла
+            return ;
         }
-
         errors.rejectValue("username", "", "User with this email already exists");
     }
 

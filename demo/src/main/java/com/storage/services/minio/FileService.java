@@ -95,10 +95,12 @@ public class FileService {
 
     public void uploadFolder(int userId, String folderPath, MultipartFile[] files) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         String userFolder = "user-" + userId + "-files/";
+//      Если фолдерПаф пустой, тогда папка загружается в рутовую папку пользователя
+//        if(folderPath == null || folderPath.isEmpty()) {
+//            throw new IllegalArgumentException("folderPath is empty");
+//        }
 
-        if(folderPath == null || folderPath.isEmpty()) {
-            throw new IllegalArgumentException("folderPath is empty");
-        }
+
 
         for (MultipartFile file : files) {
             String filename = file.getOriginalFilename();

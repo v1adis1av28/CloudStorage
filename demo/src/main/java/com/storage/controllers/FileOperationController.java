@@ -12,6 +12,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriUtils;
+
+import java.nio.charset.StandardCharsets;
 
 @Controller
 public class FileOperationController {
@@ -42,7 +45,7 @@ public class FileOperationController {
         return "redirect:/hello?path=" + directoryPath + "/";
     }
 
-    @PostMapping("renameFile")
+    @PostMapping("/renameFile")
     public String renameFile(@RequestParam("fullPath") String fullPath, @RequestParam("newName") String newName, RedirectAttributes redirectAttributes) throws Exception {
 
         if (!fullPath.contains(String.format(userRoot, getCurrentUser().getUser().getId()))) {
@@ -52,8 +55,9 @@ public class FileOperationController {
 
         fileService.renameFile(getCurrentUser().getUser().getId(),newName, fullPath);
         redirectAttributes.addFlashAttribute("successMessage", "File renamed successfully");
+        String encodedDirectoryPath = UriUtils.encodePath(directoryPath, StandardCharsets.UTF_8.name());
 
-        return "redirect:/hello?path=" + directoryPath + "/";
+        return "redirect:/hello?path=" + encodedDirectoryPath + "/";
     }
 
     private CustomUserDetails getCurrentUser() {
