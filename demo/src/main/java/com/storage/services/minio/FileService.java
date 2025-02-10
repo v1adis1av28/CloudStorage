@@ -52,7 +52,7 @@ public class FileService {
     }
 
 
-    public void uploadFile(int userId, String folderPath, InputStream inStream, String fileName, String contentType)
+    public void uploadFile( String folderPath, InputStream inStream, String fileName, String contentType)
             throws ServerException, InsufficientDataException, ErrorResponseException,
             IOException, NoSuchAlgorithmException, InvalidKeyException,
             InvalidResponseException, XmlParserException, InternalException {
@@ -64,11 +64,6 @@ public class FileService {
         if (fileName == null || fileName.isEmpty()) {
             throw new IllegalArgumentException("Имя файла не может быть пустым.");
         }
-        String userFolder = "user-" + userId + "-files/";
-//        if (!folderPath.startsWith(userFolder)) {
-//            throw new IllegalArgumentException("Недопустимый путь. Файл должен находиться в " + userFolder);
-//        }
-
         Path tempFile = Files.createTempFile(
                 fileName.substring(0, fileName.lastIndexOf('.')),
                 fileName.substring(fileName.lastIndexOf('.'))
@@ -78,7 +73,7 @@ public class FileService {
             Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        String objectPath = userFolder + folderPath + fileName;
+        String objectPath = folderPath + fileName;
 
         minioClient.uploadObject(
                 UploadObjectArgs.builder()
@@ -104,7 +99,7 @@ public class FileService {
 
         for (MultipartFile file : files) {
             String filename = file.getOriginalFilename();
-            String objectPath = userFolder + folderPath + filename;
+            String objectPath = folderPath + filename;
 
             minioClient.putObject(
                     PutObjectArgs.builder()

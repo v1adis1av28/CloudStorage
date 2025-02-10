@@ -37,11 +37,7 @@ public class IndexController {
         this.userService = userService;
     }
     //Todo
-    //  ** добавить эксепшен для поиска несуществующей директории
-    // 6) Переименовывание папки
-    // 7) посмотреть загрузку папок(вроде не работает загрузка пустой)
     // 8) чот пофиксить с файлами в которые не должен заходить(наверное что то с расширением)
-    // 9) добавить функционал загрузки в текущую папку
     @SneakyThrows
     @GetMapping(value = "/hello")
     public String index(@RequestParam(value = "path", required = false) String path, Model model) {
