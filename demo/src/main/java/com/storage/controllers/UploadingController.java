@@ -51,12 +51,24 @@ public class UploadingController {
     }
 
     @PostMapping("/uploadFolder")
-    public String uploadFolder(@RequestParam("files") MultipartFile[] files,
-                               Model model
-    ) throws Exception {
-        ;
+    public String uploadFolder(@RequestParam("files") MultipartFile[] files, Model model) throws Exception {
         if (files.length == 0) {
-            model.addAttribute("error", "Folder is empty");
+            //TODO загрузка пустой папки
+//            try {
+//                if (!folderPath.contains(String.format(userRoot, getCurrentUser().getUser().getId()))) {
+//                    throw new PermissionDeniedException("You don't have access to manage this folder");
+//                }
+//
+//                fileService.createEmptyFolder(getCurrentUser().getUser().getId(), folderPath);
+//                redirectAttributes.addFlashAttribute("successMessage", "Folder created successfully");
+//
+//                String encodedDirectoryPath = UriUtils.encodePath(folderPath.substring(0, folderPath.lastIndexOf('/')), StandardCharsets.UTF_8.name());
+//                return "redirect:/hello?path=" + encodedDirectoryPath + "/";
+//            } catch (Exception e) {
+//                redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+//                return "redirect:/hello";
+//            }
+            //fileService.createEmptyFolder(getCurrentUser().getUser().getId(), folderPath);
             return "redirect:/hello";
         }
         try {
