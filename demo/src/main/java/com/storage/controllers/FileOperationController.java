@@ -3,6 +3,7 @@ package com.storage.controllers;
 import com.storage.dto.FileInfoDto;
 import com.storage.exceptions.PermissionDeniedException;
 import com.storage.security.CustomUserDetails;
+import com.storage.services.StringOperation;
 import com.storage.services.UserService;
 import com.storage.services.minio.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +23,13 @@ public class FileOperationController {
 
     private final FileService fileService;
     private final UserService userService;
+    private final StringOperation stringOperation;
     private final String userRoot = "user-%d-files";
     @Autowired
-    public FileOperationController(FileService fileService, UserService userService) {
+    public FileOperationController(FileService fileService, UserService userService, StringOperation stringOperation) {
         this.fileService = fileService;
         this.userService = userService;
+        this.stringOperation = stringOperation;
     }
 
     @PostMapping("/deleteFile")
@@ -83,6 +86,26 @@ public class FileOperationController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             String encodedDirectoryPath = UriUtils.encodePath(folderPath.substring(0, folderPath.lastIndexOf('/')), StandardCharsets.UTF_8.name());
             return "redirect:/hello?path=" + encodedDirectoryPath + "/";
+        }
+    }
+
+    @PostMapping("/renameFolder")
+    public String renameFolder(@RequestParam("fullPath") String fullPath, @RequestParam("newName") String newName, RedirectAttributes redirectAttributes) {
+        try {
+            if (!fullPath.contains(String.format(userRoot, getCurrentUser().getUser().getId()))) {
+                throw new PermissionDeniedException("You don't have access to manage this folder");
+            }
+
+            String redirect = stringOperation.getParentPath(fullPath);
+            fileService.renameFolder(fullPath, newName);
+
+            String encodedDirectoryPath = UriUtils.encodePath(redirect, StandardCharsets.UTF_8.name());
+            return "redirect:/hello?path=" + encodedDirectoryPath;
+        } catch (PermissionDeniedException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+
+            String encodedDirectoryPath = UriUtils.encodePath(fullPath, StandardCharsets.UTF_8.name());
+            return "redirect:/hello?path=" + encodedDirectoryPath;
         }
     }
 
