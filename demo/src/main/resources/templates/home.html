@@ -152,14 +152,14 @@
     <div class="container-fluid">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">Cloud Storage</a>
+                <a class="navbar-brand" th:href="@{/hello}">Cloud Storage</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Главная</a>
+                            <a class="nav-link" th:href="@{/hello}">Главная</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">Ваши файлы</a>
@@ -194,7 +194,7 @@
         <div class="col-md-2 sidebar">
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Главная</a>
+                    <a class="nav-link" th:href="@{/hello}">Главная</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Ваши файлы</a>
@@ -209,10 +209,8 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li th:each="link : ${chain}" class="breadcrumb-item" th:classappend="${link.getParentReference() == currentPath} ? 'active' : ''">
-                        <!-- Deactivate link if it matches the current path -->
                         <span th:if="${link.getParentReference() == currentPath}" th:text="${link.getName()}"></span>
 
-                        <!-- Render as a link if it does not match the current path -->
                         <a th:if="${link.getParentReference() != currentPath}"
                            th:href="@{/hello(path=${link.getParentReference()})}"
                            th:text="${link.getName()}"></a>
@@ -253,6 +251,16 @@
                                     </button>
                                 </form>
                             </div>
+                            <div th:unless="${!file.getFullPath().endsWith('/')}" class="icon-folder">
+                                <form th:action="@{/deleteFolder}" method="post">
+                                    <input type="hidden" name="folderPath" th:value="${file.getFullPath()}"/>
+                                    <button type="submit" class="btn btn-danger">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                            <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
 
                             <div th:if="${!file.getFullPath().endsWith('/')}" class="icon-folder">
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#renameModal"
@@ -262,6 +270,15 @@
                                     </svg>
                                 </button>
                             </div>
+                            <div th:if="${file.getFullPath().endsWith('/')}">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#renameFolderModal"
+                                        th:attr="data-full-path=${file.getFullPath()}, data-short-name=${file.getShortName()}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                        <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+                                    </svg>
+                                </button>
+                            </div>
+
                         </div>
                     </div>
 
@@ -305,90 +322,179 @@
                             });
                         });
                     </script>
-                </div>
-            </div>
-                <div class="col-12">
-                    <div class="upload-container">
-                        <form method="post" th:action="@{/uploadFile}" enctype="multipart/form-data" class="upload-form">
-                            <div class="drop-zone file-drop-zone">
-                                <span class="drop-zone__prompt">Перетащите файл или нажмите для загрузки</span>
-                                <input type="file" name="file" accept=".doc,.docx,.pdf,.jpeg,.png" class="drop-zone__input">
+                    <!-- Modal for Renaming Folders -->
+                    <div class="modal fade" id="renameFolderModal" tabindex="-1" aria-labelledby="renameFolderModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="renameFolderModalLabel">Переименовать папку</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form id="renameFolderForm" th:action="@{/renameFolder}" method="post">
+                                    <div class="modal-body">
+                                        <input type="hidden" id="folderPath" name="fullPath" value=""/>
+                                        <label for="newFolderName" class="form-label">Новое имя папки:</label>
+                                        <input type="text" class="form-control" id="newFolderName" name="newName" required/>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                        <button type="submit" class="btn btn-primary">Переименовать</button>
+                                    </div>
+                                </form>
                             </div>
-                            <button type="submit" class="btn btn-primary upload-button">Загрузить файл</button>
-                        </form>
-                        <form method="post" th:action="@{/uploadFolder}" enctype="multipart/form-data" class="upload-form">
-                            <div class="drop-zone folder-drop-zone">
-                                <span class="drop-zone__prompt">Перетащите папку или нажмите для загрузки</span>
-                                <input type="file" name="files" webkitdirectory directory multiple accept=".doc,.docx,.pdf,.jpeg,.png" class="drop-zone__input">
-                            </div>
-                            <button type="submit" class="btn btn-primary upload-button">Загрузить папку</button>
-                        </form>
+                        </div>
                     </div>
+
+                    <script>
+                        // JavaScript to populate modal fields for renaming folders
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const renameFolderModal = document.getElementById('renameFolderModal');
+                            renameFolderModal.addEventListener('show.bs.modal', function (event) {
+                                const button = event.relatedTarget; // Button that triggered the modal
+                                const fullPath = button.getAttribute('data-full-path'); // Get full path from button attribute
+                                const shortName = button.getAttribute('data-short-name'); // Get short name from button attribute
+
+                                // Populate modal fields
+                                const fullPathInput = renameFolderModal.querySelector('#folderPath');
+                                const newNameInput = renameFolderModal.querySelector('#newFolderName');
+
+                                fullPathInput.value = fullPath; // Set full path in hidden input
+                                newNameInput.value = shortName; // Pre-fill new name with current folder name
+                            });
+                        });
+                    </script>
                 </div>
             </div>
-        </div>
-    </div>
-<script>
-    document.querySelectorAll(".drop-zone__input").forEach((inputElement) => {
-        const dropZoneElement = inputElement.closest(".drop-zone");
-        dropZoneElement.addEventListener("click", (e) => {
-            inputElement.click();
-        });
-        inputElement.addEventListener("change", (e) => {
-            if (inputElement.files.length) {
-                updateThumbnail(dropZoneElement, inputElement.files[0]);
-            }
-        });
-        dropZoneElement.addEventListener("dragover", (e) => {
-            e.preventDefault();
-            dropZoneElement.classList.add("drop-zone--over");
-        });
-        ["dragleave", "dragend"].forEach((type) => {
-            dropZoneElement.addEventListener(type, (e) => {
-                dropZoneElement.classList.remove("drop-zone--over");
-            });
-        });
-        dropZoneElement.addEventListener("drop", (e) => {
-            e.preventDefault();
-            if (e.dataTransfer.files.length) {
-                inputElement.files = e.dataTransfer.files;
-                updateThumbnail(dropZoneElement, e.dataTransfer.files[0]);
-            }
-            dropZoneElement.classList.remove("drop-zone--over");
-        });
-    });
+            <div class="col-12">
+                <div class="upload-container">
+                    <!-- Form for Uploading Files -->
+                    <form method="post" th:action="@{/uploadFile}" enctype="multipart/form-data" class="upload-form">
+                        <div class="drop-zone file-drop-zone">
+                            <span class="drop-zone__prompt">Перетащите файл или нажмите для загрузки</span>
+                            <input type="hidden" id="currentFilePath" name="currentPath" th:value="${currentPath}" />
+                            <input type="file" name="file" accept=".doc,.docx,.pdf,.jpeg,.png,.txt,.py,.java" class="drop-zone__input">
+                        </div>
+                        <button type="submit" class="btn btn-primary upload-button" disabled>Загрузить файл</button>
+                    </form>
 
-    /**
-     * Updates the thumbnail on a drop zone element.
-     *
-     * @param {HTMLElement} dropZoneElement
-     * @param {File} file
-     */
-    function updateThumbnail(dropZoneElement, file) {
-        let thumbnailElement = dropZoneElement.querySelector(".drop-zone__thumb");
-        // First time - remove the prompt
-        if (dropZoneElement.querySelector(".drop-zone__prompt")) {
-            dropZoneElement.querySelector(".drop-zone__prompt").remove();
-        }
-        // First time - there is no thumbnail element, so lets create it
-        if (!thumbnailElement) {
-            thumbnailElement = document.createElement("div");
-            thumbnailElement.classList.add("drop-zone__thumb");
-            dropZoneElement.appendChild(thumbnailElement);
-        }
-        thumbnailElement.dataset.label = file.name;
-        // Show thumbnail for image files
-        if (file.type.startsWith("image/")) {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => {
-                thumbnailElement.style.backgroundImage = url('${reader.result}');
-            };
-        } else {
-            thumbnailElement.style.backgroundImage = null;
-        }
-    }
-</script>
+                    <!-- Form for Uploading Folders -->
+                    <form method="post" th:action="@{/uploadFolder}" enctype="multipart/form-data" class="upload-form">
+                        <div class="drop-zone folder-drop-zone">
+                            <span class="drop-zone__prompt">Перетащите папку или нажмите для загрузки</span>
+                            <input type="hidden" id="currentFolderPath" name="currentPath" th:value="${currentPath}" />
+                            <input type="file" name="files" webkitdirectory directory multiple accept=".doc,.docx,.pdf,.jpeg,.png" class="drop-zone__input">
+                        </div>
+                        <button type="submit" class="btn btn-primary upload-button" disabled>Загрузить папку</button>
+                    </form>
+                </div>
+            </div>
+
+            <script>
+                document.querySelectorAll(".drop-zone__input").forEach((inputElement) => {
+                    const dropZoneElement = inputElement.closest(".drop-zone");
+                    const submitButton = dropZoneElement.closest("form").querySelector(".upload-button");
+
+                    // Initialize the button as disabled
+                    submitButton.disabled = true;
+
+                    // Enable the button when a file/folder is selected
+                    function toggleSubmitButton() {
+                        if (inputElement.files.length > 0) {
+                            submitButton.disabled = false;
+                        } else {
+                            submitButton.disabled = true;
+                        }
+                    }
+
+                    // Click event to trigger file selection
+                    dropZoneElement.addEventListener("click", (e) => {
+                        inputElement.click();
+                    });
+
+                    // Update button state on file selection change
+                    inputElement.addEventListener("change", (e) => {
+                        toggleSubmitButton();
+                        if (inputElement.files.length) {
+                            updateThumbnail(dropZoneElement, inputElement.files[0]);
+                        } else {
+                            removeThumbnail(dropZoneElement);
+                        }
+                    });
+
+                    // Drag-and-drop events
+                    dropZoneElement.addEventListener("dragover", (e) => {
+                        e.preventDefault();
+                        dropZoneElement.classList.add("drop-zone--over");
+                    });
+                    ["dragleave", "dragend"].forEach((type) => {
+                        dropZoneElement.addEventListener(type, (e) => {
+                            dropZoneElement.classList.remove("drop-zone--over");
+                        });
+                    });
+                    dropZoneElement.addEventListener("drop", (e) => {
+                        e.preventDefault();
+                        if (e.dataTransfer.files.length) {
+                            inputElement.files = e.dataTransfer.files;
+                            toggleSubmitButton();
+                            updateThumbnail(dropZoneElement, e.dataTransfer.files[0]);
+                        }
+                        dropZoneElement.classList.remove("drop-zone--over");
+                    });
+                });
+
+                /**
+                 * Updates the thumbnail on a drop zone element.
+                 *
+                 * @param {HTMLElement} dropZoneElement
+                 * @param {File} file
+                 */
+                function updateThumbnail(dropZoneElement, file) {
+                    let thumbnailElement = dropZoneElement.querySelector(".drop-zone__thumb");
+
+                    // Remove the prompt if it exists
+                    if (dropZoneElement.querySelector(".drop-zone__prompt")) {
+                        dropZoneElement.querySelector(".drop-zone__prompt").remove();
+                    }
+
+                    // Create or update the thumbnail element
+                    if (!thumbnailElement) {
+                        thumbnailElement = document.createElement("div");
+                        thumbnailElement.classList.add("drop-zone__thumb");
+                        dropZoneElement.appendChild(thumbnailElement);
+                    }
+
+                    thumbnailElement.dataset.label = file.name;
+
+                    // Show thumbnail for image files
+                    if (file.type.startsWith("image/")) {
+                        const reader = new FileReader();
+                        reader.readAsDataURL(file);
+                        reader.onload = () => {
+                            thumbnailElement.style.backgroundImage = `url('${reader.result}')`;
+                        };
+                    } else {
+                        thumbnailElement.style.backgroundImage = null;
+                    }
+                }
+
+                /**
+                 * Removes the thumbnail and resets the drop zone.
+                 *
+                 * @param {HTMLElement} dropZoneElement
+                 */
+                function removeThumbnail(dropZoneElement) {
+                    const thumbnailElement = dropZoneElement.querySelector(".drop-zone__thumb");
+                    if (thumbnailElement) {
+                        thumbnailElement.remove();
+                    }
+                    const promptElement = document.createElement("span");
+                    promptElement.classList.add("drop-zone__prompt");
+                    promptElement.textContent = dropZoneElement.classList.contains("file-drop-zone")
+                        ? "Перетащите файл или нажмите для загрузки"
+                        : "Перетащите папку или нажмите для загрузки";
+                    dropZoneElement.appendChild(promptElement);
+                }
+            </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

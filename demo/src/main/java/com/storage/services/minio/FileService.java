@@ -52,7 +52,7 @@ public class FileService {
     }
 
 
-    public void uploadFile(int userId, String folderPath, InputStream inStream, String fileName, String contentType)
+    public void uploadFile( String folderPath, InputStream inStream, String fileName, String contentType)
             throws ServerException, InsufficientDataException, ErrorResponseException,
             IOException, NoSuchAlgorithmException, InvalidKeyException,
             InvalidResponseException, XmlParserException, InternalException {
@@ -64,11 +64,6 @@ public class FileService {
         if (fileName == null || fileName.isEmpty()) {
             throw new IllegalArgumentException("Имя файла не может быть пустым.");
         }
-        String userFolder = "user-" + userId + "-files/";
-//        if (!folderPath.startsWith(userFolder)) {
-//            throw new IllegalArgumentException("Недопустимый путь. Файл должен находиться в " + userFolder);
-//        }
-
         Path tempFile = Files.createTempFile(
                 fileName.substring(0, fileName.lastIndexOf('.')),
                 fileName.substring(fileName.lastIndexOf('.'))
@@ -78,7 +73,7 @@ public class FileService {
             Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        String objectPath = userFolder + folderPath + fileName;
+        String objectPath = folderPath + fileName;
 
         minioClient.uploadObject(
                 UploadObjectArgs.builder()
@@ -104,7 +99,7 @@ public class FileService {
 
         for (MultipartFile file : files) {
             String filename = file.getOriginalFilename();
-            String objectPath = userFolder + folderPath + filename;
+            String objectPath = folderPath + filename;
 
             minioClient.putObject(
                     PutObjectArgs.builder()
@@ -138,30 +133,59 @@ public class FileService {
     }
 
 
-    //user-20-files/test/
     @SneakyThrows
     public void removeFolder(String folderPath) {
         if (!folderPath.endsWith("/")) {
-            throw new IllegalArgumentException("folder path must end with /");
+            throw new IllegalArgumentException("Folder path must end with '/'");
         }
 
+        String parentFolderPath = folderPath.substring(0, folderPath.substring(0, folderPath.length() - 1).lastIndexOf('/') + 1);
+
         ArrayList<String> itemsToDelete = new ArrayList<>();
-        Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder()
-                .bucket(ROOT_BUCKET).prefix(folderPath)
-                .recursive(true).build());
+        Iterable<Result<Item>> results = minioClient.listObjects(
+                ListObjectsArgs.builder()
+                        .bucket(ROOT_BUCKET)
+                        .prefix(folderPath)
+                        .recursive(true)
+                        .build());
 
         for (Result<Item> result : results) {
             itemsToDelete.add(result.get().objectName());
-            System.out.println(result.get().objectName());
         }
 
         for (String item : itemsToDelete) {
-            System.out.println(item);
-            removeFile(item);
-            System.out.println("delete file named -> " + item);
+            minioClient.removeObject(RemoveObjectArgs.builder().bucket(ROOT_BUCKET).object(item).build());
         }
 
+        if (!parentFolderPath.equals("/")) {
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(ROOT_BUCKET)
+                            .object(parentFolderPath)
+                            .stream(new ByteArrayInputStream(new byte[0]), 0, -1)
+                            .build());
+        }
     }
+
+
+    @SneakyThrows
+    public void createEmptyFolder(int userId, String folderPath) {
+        if (!folderPath.endsWith("/")) {
+            throw new IllegalArgumentException("Folder path must end with '/'");
+        }
+
+        String userFolder = "user-" + userId + "-files/";
+        String fullFolderPath = userFolder + folderPath;
+
+        minioClient.putObject(
+                PutObjectArgs.builder()
+                        .bucket(ROOT_BUCKET)
+                        .object(fullFolderPath)
+                        .stream(new ByteArrayInputStream(new byte[0]), 0, -1)
+                        .build()
+        );
+    }
+
 
     @SneakyThrows
     public void renameFolder(String folderPath, String newFolderName) {
