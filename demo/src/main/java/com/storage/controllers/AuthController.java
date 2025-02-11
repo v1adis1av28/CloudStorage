@@ -2,6 +2,7 @@ package com.storage.controllers;
 
 import com.storage.model.User;
 import com.storage.services.UserService;
+
 import com.storage.services.minio.FileService;
 import com.storage.validation.UserValidation;
 import jakarta.servlet.ServletException;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,6 +26,7 @@ public class AuthController {
 
     private final UserService userService;
     private final UserValidation userValidation;
+
     private final FileService fileService;
     @Autowired
     public AuthController(UserService userService, UserValidation userValidation,  FileService fileService) {
@@ -36,7 +39,6 @@ public class AuthController {
 
     @GetMapping("/login")
     public String login() {
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return "login";
@@ -66,6 +68,7 @@ public class AuthController {
         userValidation.validate(user, result);
         System.out.println("Received user: " + user.getUsername() + ", " + user.getPassword());
 
+
         if(result.hasErrors()) {
             return "registration";
         }
@@ -79,7 +82,7 @@ public class AuthController {
         fileService.createInitialUserFolder(user.getId());
         return "redirect:/hello";
     }
-
+  
     private void authenticateUser(User user, HttpServletRequest request) throws ServletException {
         request.getSession().setAttribute("user", user);
         request.login(user.getUsername(),user.getPassword());

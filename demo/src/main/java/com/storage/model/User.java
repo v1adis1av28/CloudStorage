@@ -27,6 +27,7 @@ public class User {
 
     @Column(name="password",nullable = false)
     @NotEmpty(message = "Password cannot be empty")
+
     private String password;
 
     @Column(name="role")

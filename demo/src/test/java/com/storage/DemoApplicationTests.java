@@ -9,5 +9,4 @@ class DemoApplicationTests {
     @Test
     void contextLoads() {
     }
-    //TODO написать интеграционные тесты для авторизации
 }
