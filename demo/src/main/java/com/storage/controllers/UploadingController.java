@@ -3,6 +3,7 @@ package com.storage.controllers;
 
 import com.storage.exceptions.PermissionDeniedException;
 import com.storage.security.CustomUserDetails;
+import com.storage.services.StringOperation;
 import com.storage.services.UserService;
 import com.storage.services.minio.FileService;
 import io.minio.errors.*;
@@ -30,18 +31,26 @@ public class UploadingController {
     private final FileService fileService;
     private final UserService userService;
     private final String userRootFolder = "user-%d-files/";
+    private final StringOperation stringOperation;
 
     @Autowired
-    public UploadingController(FileService fileService, UserService userService) {
+    public UploadingController(FileService fileService, UserService userService, StringOperation stringOperation) {
         this.fileService = fileService;
         this.userService = userService;
+        this.stringOperation = stringOperation;
     }
 
 
+    //TODO Закрыть доступ для загрузки файла и папки не в свою директорию
     @PostMapping("/uploadFile")
-    public String uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("currentPath") String currentPath, RedirectAttributes redirectAttributes) throws ServerException, InsufficientDataException, ErrorResponseException,
-            IOException, NoSuchAlgorithmException, InvalidKeyException,
-            InvalidResponseException, XmlParserException, InternalException {
+    public String uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("currentPath") String currentPath, RedirectAttributes redirectAttributes) throws ServerException, InsufficientDataException, ErrorResponseException
+    {
+
+        if(!stringOperation.rightsVerification(currentPath,String.format(userRootFolder, getCurrentUser().getUser().getId())))
+        {
+            redirectAttributes.addFlashAttribute("errorMessage", "У вас нет доступа к изменению этой папки");
+            return "redirect:/hello?path=" + UriUtils.encodePath(currentPath, StandardCharsets.UTF_8.name());
+        }
 
         if (file == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "Файл не выбран");
@@ -72,6 +81,11 @@ public class UploadingController {
     public String uploadFolder(@RequestParam("files") MultipartFile[] files, @RequestParam("currentPath") String currentPath, RedirectAttributes redirectAttributes) throws Exception {
 
         try {
+            if(!stringOperation.rightsVerification(currentPath,String.format(userRootFolder, getCurrentUser().getUser().getId())))
+            {
+                redirectAttributes.addFlashAttribute("errorMessage", "У вас нет доступа к изменению этой папки");
+                return "redirect:/hello?path=" + UriUtils.encodePath(currentPath, StandardCharsets.UTF_8.name());
+            }
             if (files.length == 0) {
                 if (currentPath == null || currentPath.isEmpty()) {
                     throw new IllegalArgumentException("Current path is required to create a folder");

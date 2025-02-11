@@ -4,7 +4,11 @@ import com.storage.dto.FileInfoDto;
 import io.minio.messages.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -77,5 +81,31 @@ public class StringOperation {
         {
             return str.substring(0,str.substring(0,str.lastIndexOf("/")).lastIndexOf("/")+1);
         }
+    }
+
+    public String encodeFilenameForDownload(String filename) {
+        if (StringUtils.hasText(filename)) {
+            try {
+                String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8.name())
+                        .replace("+", "%20");
+                return "filename=\"" + sanitizeAsciiFilename(filename) + "\"; filename*=UTF-8''" + encodedFilename;
+            } catch (UnsupportedEncodingException e) {
+                throw new IllegalArgumentException("Failed to encode filename", e);
+            }
+        }
+        return "filename=\"unknown\"";
+    }
+
+    private String sanitizeAsciiFilename(String filename) {
+        return filename.replaceAll("[^\\x20-\\x7e]", "_");
+    }
+
+    public boolean rightsVerification(String currentPath, String userRootFolder) {
+
+        if(userRootFolder.equals(currentPath.split("/")[0]))
+        {
+            return true;
+        }
+        return false;
     }
 }

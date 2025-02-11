@@ -131,23 +131,18 @@ public class FileService {
 
 
     @SneakyThrows
-    public void downloadFile(String filePath)
-    {
-        if(filePath.endsWith("/"))
-        {
+    public InputStream downloadFile(String filePath) {
+        if (filePath.endsWith("/")) {
             throw new IllegalArgumentException("Вы не можете скачать папку");
         }
 
-        String fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-
-        minioClient.downloadObject(DownloadObjectArgs
-                .builder()
-                .bucket(ROOT_BUCKET)
-                .object(filePath)
-                .filename(fileName)
-                .build());
-        System.out.println("файл был скачан ");
-        System.out.println(filePath);
+        // Retrieve the file content from MinIO
+        return minioClient.getObject(
+                GetObjectArgs.builder()
+                        .bucket(ROOT_BUCKET)
+                        .object(filePath)
+                        .build()
+        );
     }
 
 

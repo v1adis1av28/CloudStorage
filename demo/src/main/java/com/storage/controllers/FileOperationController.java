@@ -7,6 +7,11 @@ import com.storage.services.StringOperation;
 import com.storage.services.UserService;
 import com.storage.services.minio.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -15,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriUtils;
 
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 @Controller
@@ -48,20 +54,23 @@ public class FileOperationController {
         return "redirect:/hello?path=" + UriUtils.encodePath(directoryPath,StandardCharsets.UTF_8) + "/";
     }
 
-    //TODO пофиксить путь с скачиванием
     @PostMapping("/downloadFile")
-    public String downloadFile(@RequestParam("fullPath") String fullPath) throws PermissionDeniedException {
+    public ResponseEntity<Resource> downloadFile(@RequestParam("fullPath") String fullPath) throws Exception {
         if (!fullPath.contains(String.format(userRoot, getCurrentUser().getUser().getId()))) {
             throw new PermissionDeniedException("You don't have access to manage files");
         }
 
-        fileService.downloadFile(fullPath);
+        InputStream inputStream = fileService.downloadFile(fullPath);
+        String fileName = fullPath.substring(fullPath.lastIndexOf('/') + 1);
 
-        String directoryPath = fullPath.substring(0, fullPath.lastIndexOf('/'));
-        if (directoryPath.isEmpty()) {
-            directoryPath = String.format(userRoot, getCurrentUser().getUser().getId());
-        }
-        return "redirect:/hello?path=" + UriUtils.encodePath(directoryPath,StandardCharsets.UTF_8) + "/";
+        String contentDispositionHeader = stringOperation.encodeFilenameForDownload(fileName);
+
+        InputStreamResource resource = new InputStreamResource(inputStream);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDispositionHeader)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 
     @PostMapping("/renameFile")
