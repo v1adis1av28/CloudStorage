@@ -46,6 +46,7 @@ public class IndexController {
     // 4) Добавить спринг сесси и редис
     // 5) Рефакторинг кода + чистка
     // 6) Докер компоуз
+
     @SneakyThrows
     @GetMapping(value = "/hello")
     public String index(@RequestParam(value = "path", required = false) String path, Model model) {

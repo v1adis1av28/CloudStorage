@@ -45,7 +45,23 @@ public class FileOperationController {
             directoryPath = String.format(userRoot, getCurrentUser().getUser().getId());
         }
 
-        return "redirect:/hello?path=" + directoryPath + "/";
+        return "redirect:/hello?path=" + UriUtils.encodePath(directoryPath,StandardCharsets.UTF_8) + "/";
+    }
+
+    //TODO пофиксить путь с скачиванием
+    @PostMapping("/downloadFile")
+    public String downloadFile(@RequestParam("fullPath") String fullPath) throws PermissionDeniedException {
+        if (!fullPath.contains(String.format(userRoot, getCurrentUser().getUser().getId()))) {
+            throw new PermissionDeniedException("You don't have access to manage files");
+        }
+
+        fileService.downloadFile(fullPath);
+
+        String directoryPath = fullPath.substring(0, fullPath.lastIndexOf('/'));
+        if (directoryPath.isEmpty()) {
+            directoryPath = String.format(userRoot, getCurrentUser().getUser().getId());
+        }
+        return "redirect:/hello?path=" + UriUtils.encodePath(directoryPath,StandardCharsets.UTF_8) + "/";
     }
 
     @PostMapping("/renameFile")

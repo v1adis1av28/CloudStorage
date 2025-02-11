@@ -94,9 +94,6 @@ public class FileService {
 //        if(folderPath == null || folderPath.isEmpty()) {
 //            throw new IllegalArgumentException("folderPath is empty");
 //        }
-
-
-
         for (MultipartFile file : files) {
             String filename = file.getOriginalFilename();
             String objectPath = folderPath + filename;
@@ -130,6 +127,27 @@ public class FileService {
     @SneakyThrows
     public void removeFile(String filePath) {
         minioClient.removeObject(RemoveObjectArgs.builder().bucket(ROOT_BUCKET).object(filePath).build());
+    }
+
+
+    @SneakyThrows
+    public void downloadFile(String filePath)
+    {
+        if(filePath.endsWith("/"))
+        {
+            throw new IllegalArgumentException("Вы не можете скачать папку");
+        }
+
+        String fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
+
+        minioClient.downloadObject(DownloadObjectArgs
+                .builder()
+                .bucket(ROOT_BUCKET)
+                .object(filePath)
+                .filename(fileName)
+                .build());
+        System.out.println("файл был скачан ");
+        System.out.println(filePath);
     }
 
 
