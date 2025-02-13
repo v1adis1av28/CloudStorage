@@ -46,11 +46,6 @@ public class AuthController {
         return "redirect:/hello";
     }
 
-
-    //По тз при регистрации для пользователя должен создаваться бакет
-    //в формате user-${id}-files, где id является идентификатором пользователя из SQL базы.
-    //Каждая из таких папок является корнем для хранения папок данного пользователя.
-    // Пример - файл docs/test.txt пользователя с id 1 должен быть сохранён в путь user-1-files/docs/test.txt.
     @GetMapping("/registration")
     public String registration(@ModelAttribute("user") User user)
     {
