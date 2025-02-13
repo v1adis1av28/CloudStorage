@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 
 //Класс в котором будет проходить работа с DTO
@@ -22,7 +23,7 @@ public class DTOService {
     }
 
 
-    public ArrayList<FileInfoDto> convertPathToFileInfoDto(HashSet<String> paths) {
+    public ArrayList<FileInfoDto> convertPathToFileInfoDto(Collection<String> paths) {
 
         ArrayList<FileInfoDto> fileInfoDtos = new ArrayList<>();
 

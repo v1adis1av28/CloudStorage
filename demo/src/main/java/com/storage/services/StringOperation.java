@@ -11,6 +11,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 @Service
 public class StringOperation {
@@ -102,10 +103,20 @@ public class StringOperation {
 
     public boolean rightsVerification(String currentPath, String userRootFolder) {
 
-        if(userRootFolder.equals(currentPath.split("/")[0]))
+        if(userRootFolder.substring(0,userRootFolder.lastIndexOf("/")).equals(currentPath.split("/")[0]))
         {
             return true;
         }
         return false;
+    }
+
+    public ArrayList<String> findObjectsByQuery(String query, List<String> paths) {
+        ArrayList<String> results = new ArrayList<>();
+        for (String path : paths) {
+            if (path.contains(query)) {
+                results.add(path);
+            }
+        }
+        return results;
     }
 }

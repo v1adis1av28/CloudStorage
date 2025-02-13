@@ -37,8 +37,7 @@ public class IndexController {
         this.userService = userService;
     }
     //Todo
-    // Выкатить в мейн ветку мвп
-    // Подумать над изменением формата файлов, например сделать регулярное выражение чтобы не менялось расширение
+    // (refactoring)Подумать над изменением формата файлов, например сделать регулярное выражение чтобы не менялось расширение
     // Реализовать Поиск файла, страница, форма поиска, и сервис поиска Контент
     // Форма поиска файлов и папок по названию
     // Список найденных файлов. Для каждого найденного файла отображаем имя и кнопку для перехода в папку, содержащую данный файл
@@ -66,7 +65,7 @@ public class IndexController {
         }
 
         model.addAttribute("currentPath", currentPath);
-        model.addAttribute("User", getCurrentUser().getUser());
+        model.addAttribute("User", getCurrentUser());
         return "home";
     }
 

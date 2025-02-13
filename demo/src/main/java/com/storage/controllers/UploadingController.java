@@ -7,6 +7,7 @@ import com.storage.services.StringOperation;
 import com.storage.services.UserService;
 import com.storage.services.minio.FileService;
 import io.minio.errors.*;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,9 +43,16 @@ public class UploadingController {
 
 
     //TODO Закрыть доступ для загрузки файла и папки не в свою директорию
+    @SneakyThrows
     @PostMapping("/uploadFile")
-    public String uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("currentPath") String currentPath, RedirectAttributes redirectAttributes) throws ServerException, InsufficientDataException, ErrorResponseException
-    {
+    public String uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("currentPath") String currentPath, RedirectAttributes redirectAttributes) throws ServerException, InsufficientDataException, ErrorResponseException, IOException {
+
+        if(currentPath.isEmpty())
+        {
+            String folderPath =String.format(userRootFolder,getCurrentUser().getUser().getId());
+            fileService.uploadFile(folderPath,file.getInputStream(),file.getOriginalFilename(),file.getContentType());
+            return "redirect:/hello?path="+folderPath;
+        }
 
         if(!stringOperation.rightsVerification(currentPath,String.format(userRootFolder, getCurrentUser().getUser().getId())))
         {
@@ -81,6 +89,12 @@ public class UploadingController {
     public String uploadFolder(@RequestParam("files") MultipartFile[] files, @RequestParam("currentPath") String currentPath, RedirectAttributes redirectAttributes) throws Exception {
 
         try {
+            if (currentPath.isEmpty())
+            {
+                String folderPath =String.format(userRootFolder,getCurrentUser().getUser().getId());
+                fileService.uploadFolder(getCurrentUser().getUser().getId(), folderPath, files);
+            return "redirect:/hello?path=" + UriUtils.encodePath(folderPath, StandardCharsets.UTF_8.name());
+            }
             if(!stringOperation.rightsVerification(currentPath,String.format(userRootFolder, getCurrentUser().getUser().getId())))
             {
                 redirectAttributes.addFlashAttribute("errorMessage", "У вас нет доступа к изменению этой папки");

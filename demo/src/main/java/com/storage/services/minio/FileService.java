@@ -8,6 +8,7 @@ import io.minio.*;
 import io.minio.errors.*;
 import io.minio.messages.Item;
 import lombok.SneakyThrows;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class FileService {
@@ -256,5 +259,17 @@ public class FileService {
         }
         HashSet<String> tmp = stringOperation.getFileAndFolders(userRootFolder,arr);
         return dtoService.convertPathToFileInfoDto(tmp);
+    }
+
+    public ArrayList<FileInfoDto> getObjectsByQuery(String query) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder().bucket(ROOT_BUCKET).recursive(true).build());
+        ArrayList<String> arr = new ArrayList<>();
+        System.out.println("getObjectsByQuery");
+        for (Result<Item> result : results) {
+            arr.add(result.get().objectName());
+            System.out.println(result.get().objectName());
+        }
+        List<String> objects = stringOperation.findObjectsByQuery(query,arr);
+        return dtoService.convertPathToFileInfoDto(objects);
     }
 }
