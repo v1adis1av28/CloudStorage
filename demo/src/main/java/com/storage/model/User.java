@@ -1,38 +1,37 @@
 package com.storage.model;
 
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import java.io.Serializable; // Добавляем Serializable
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name = "id")
     private int id;
 
-    @Column(name="username", unique=true, nullable=false)
+    @Column(name = "username", unique = true, nullable = false)
     @Email(message = "email should have correct form!")
-    @NotEmpty(message="email should not be empty")
+    @NotEmpty(message = "email should not be empty")
     private String username;
 
-    @Column(name="password",nullable = false)
+    @Column(name = "password", nullable = false)
     @NotEmpty(message = "Password cannot be empty")
-
     private String password;
 
-    @Column(name="role")
+    @Column(name = "role")
     private String role;
-
 
     public int getId() {
         return id;
