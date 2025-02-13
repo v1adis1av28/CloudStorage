@@ -41,9 +41,8 @@ public class FileOperationController {
     @PostMapping("/deleteFile")
     public String deleteFile(@RequestParam("fullPath") String fullPath) throws PermissionDeniedException {
         if (!fullPath.contains(String.format(userRoot, getCurrentUser().getUser().getId()))) {
-            throw new PermissionDeniedException("You don't have access to manage files");
+            return "redirect:/hello?path=" + UriUtils.encodePath(fullPath, StandardCharsets.UTF_8.name());
         }
-
         fileService.removeFile(fullPath);
 
         String directoryPath = fullPath.substring(0, fullPath.lastIndexOf('/'));
@@ -56,9 +55,9 @@ public class FileOperationController {
 
     @PostMapping("/downloadFile")
     public ResponseEntity<Resource> downloadFile(@RequestParam("fullPath") String fullPath) throws Exception {
-        if (!fullPath.contains(String.format(userRoot, getCurrentUser().getUser().getId()))) {
-            throw new PermissionDeniedException("You don't have access to manage files");
-        }
+//        if (!fullPath.contains(String.format(userRoot, getCurrentUser().getUser().getId()))) {
+//            throw new PermissionDeniedException("You don't have access to manage files");
+//        }
 
         InputStream inputStream = fileService.downloadFile(fullPath);
         String fileName = fullPath.substring(fullPath.lastIndexOf('/') + 1);
@@ -75,63 +74,43 @@ public class FileOperationController {
 
     @PostMapping("/renameFile")
     public String renameFile(@RequestParam("fullPath") String fullPath, @RequestParam("newName") String newName, RedirectAttributes redirectAttributes) {
-        try {
-            if (!fullPath.contains(String.format(userRoot, getCurrentUser().getUser().getId()))) {
-                throw new PermissionDeniedException("You don't have access to manage this file");
-            }
-
-            String directoryPath = fullPath.substring(0, fullPath.lastIndexOf('/'));
-            fileService.renameFile(getCurrentUser().getUser().getId(), newName, fullPath);
-            redirectAttributes.addFlashAttribute("successMessage", "File renamed successfully");
-
-            String encodedDirectoryPath = UriUtils.encodePath(directoryPath, StandardCharsets.UTF_8.name());
-            return "redirect:/hello?path=" + encodedDirectoryPath + "/";
-        } catch (PermissionDeniedException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-
-            String encodedDirectoryPath = UriUtils.encodePath(fullPath.substring(0, fullPath.lastIndexOf('/')), StandardCharsets.UTF_8.name());
-            return "redirect:/hello?path=" + encodedDirectoryPath + "/";
+        if (!fullPath.contains(String.format(userRoot, getCurrentUser().getUser().getId()))) {
+            return "redirect:/hello?path=" + UriUtils.encodePath(fullPath, StandardCharsets.UTF_8.name());
         }
+
+        String directoryPath = fullPath.substring(0, fullPath.lastIndexOf('/'));
+        fileService.renameFile(getCurrentUser().getUser().getId(), newName, fullPath);
+        redirectAttributes.addFlashAttribute("successMessage", "File renamed successfully");
+
+        String encodedDirectoryPath = UriUtils.encodePath(directoryPath, StandardCharsets.UTF_8.name());
+        return "redirect:/hello?path=" + encodedDirectoryPath + "/";
     }
     @PostMapping("/deleteFolder")
     public String removeFolder(@RequestParam("folderPath") String folderPath, RedirectAttributes redirectAttributes) {
-        try {
-            if (!folderPath.contains(String.format(userRoot, getCurrentUser().getUser().getId()))) {
-                throw new PermissionDeniedException("You don't have access to manage this folder");
-            }
-
-            String pathToRedirect = folderPath.substring(0, folderPath.substring(0, folderPath.lastIndexOf('/') - 1).lastIndexOf('/'));
-            fileService.removeFolder(folderPath);
-
-            redirectAttributes.addFlashAttribute("successMessage", "Folder removed successfully");
-
-            String encodedDirectoryPath = UriUtils.encodePath(pathToRedirect, StandardCharsets.UTF_8.name());
-            return "redirect:/hello?path=" + encodedDirectoryPath + "/";
-        } catch (PermissionDeniedException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            String encodedDirectoryPath = UriUtils.encodePath(folderPath.substring(0, folderPath.lastIndexOf('/')), StandardCharsets.UTF_8.name());
-            return "redirect:/hello?path=" + encodedDirectoryPath + "/";
+        if (!folderPath.contains(String.format(userRoot, getCurrentUser().getUser().getId()))) {
+            return "redirect:/hello?path=" + UriUtils.encodePath(folderPath, StandardCharsets.UTF_8.name());
         }
+
+        String pathToRedirect = folderPath.substring(0, folderPath.substring(0, folderPath.lastIndexOf('/') - 1).lastIndexOf('/'));
+        fileService.removeFolder(folderPath);
+
+        redirectAttributes.addFlashAttribute("successMessage", "Folder removed successfully");
+
+        String encodedDirectoryPath = UriUtils.encodePath(pathToRedirect, StandardCharsets.UTF_8.name());
+        return "redirect:/hello?path=" + encodedDirectoryPath + "/";
     }
 
     @PostMapping("/renameFolder")
     public String renameFolder(@RequestParam("fullPath") String fullPath, @RequestParam("newName") String newName, RedirectAttributes redirectAttributes) {
-        try {
-            if (!fullPath.contains(String.format(userRoot, getCurrentUser().getUser().getId()))) {
-                throw new PermissionDeniedException("You don't have access to manage this folder");
-            }
-
-            String redirect = stringOperation.getParentPath(fullPath);
-            fileService.renameFolder(fullPath, newName);
-
-            String encodedDirectoryPath = UriUtils.encodePath(redirect, StandardCharsets.UTF_8.name());
-            return "redirect:/hello?path=" + encodedDirectoryPath;
-        } catch (PermissionDeniedException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-
-            String encodedDirectoryPath = UriUtils.encodePath(fullPath, StandardCharsets.UTF_8.name());
-            return "redirect:/hello?path=" + encodedDirectoryPath;
+        if (!fullPath.contains(String.format(userRoot, getCurrentUser().getUser().getId()))) {
+            return "redirect:/hello?path=" + UriUtils.encodePath(fullPath, StandardCharsets.UTF_8.name());
         }
+
+        String redirect = stringOperation.getParentPath(fullPath);
+        fileService.renameFolder(fullPath, newName);
+
+        String encodedDirectoryPath = UriUtils.encodePath(redirect, StandardCharsets.UTF_8.name());
+        return "redirect:/hello?path=" + encodedDirectoryPath;
     }
 
     private CustomUserDetails getCurrentUser() {
