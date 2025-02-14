@@ -39,9 +39,9 @@ public class IndexController {
     //Todo
     // (refactoring)Подумать над изменением формата файлов, например сделать регулярное выражение чтобы не менялось расширение
     // 5) Рефакторинг кода + чистка
-    // 5.1 Фикс валидацию формы регистрации (должен после @ идти точка, и пустой пароль не должен быть)
     // 5.2 убрать в чужих папки кнопки для менеджмента
     // 5.3 При переименововании делать проверку на пустое название
+    // 5.4 Оповещение о ошибке (хотелось бы в модальное окно)
     // 6) Докер компоуз
 
     @SneakyThrows
@@ -52,17 +52,17 @@ public class IndexController {
         }
 
         String currentPath = (path == null || path.isEmpty()) ? "" : path;
-
+        String userRoot = String.format(userRootFolder, getCurrentUser().getUser().getId());
         if (path != null) {
             model.addAttribute("chain", BreadcrumbsHandle.createBreadcrumbsByPath(path));
             model.addAttribute("path", path);
             model.addAttribute("files", fileService.getFolderObjects(path));
         } else {
-            String userRoot = String.format(userRootFolder, getCurrentUser().getUser().getId());
             model.addAttribute("chain", BreadcrumbsHandle.createBreadcrumbsByPath(userRoot));
             model.addAttribute("files", fileService.getFolderObjects(userRoot));
         }
-
+       // в хтмлке убрть для чужих элементов кнопки управления
+        model.addAttribute("rootFolderPath", userRoot);
         model.addAttribute("currentPath", currentPath);
         model.addAttribute("User", getCurrentUser());
         return "home";

@@ -28,6 +28,7 @@ public class SearchController {
 
     private final FileService fileService;
     private final UserService userService;
+    private final String userRootFolder = "user-%d-files/";
 
     @Autowired
     public SearchController(FileService fileService, UserService userService)
@@ -40,6 +41,7 @@ public class SearchController {
     @GetMapping
     public String search(@RequestParam("query") String query, Model model) {
         model.addAttribute("User", getCurrentUser());
+        model.addAttribute("rootFolderPath", String.format(userRootFolder, getCurrentUser().getUser().getId()));
         System.out.println("Зашел в серч");
         try {
             System.out.println(query);
