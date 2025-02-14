@@ -35,8 +35,6 @@ public class AuthController {
         this.fileService = fileService;
     }
 
-    //TODO посмотреть как и добавить сессии при аутентификации
-
     @GetMapping("/login")
     public String login() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -49,6 +47,7 @@ public class AuthController {
     @GetMapping("/registration")
     public String registration(@ModelAttribute("user") User user)
     {
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return "registration";
@@ -59,22 +58,33 @@ public class AuthController {
 
     @SneakyThrows
     @PostMapping("/register")
-    public String registration(@ModelAttribute("user") User user, BindingResult result,HttpServletRequest request, Model model) throws ServletException {
+    public String registration(@ModelAttribute("user") User user, BindingResult result, HttpServletRequest request, Model model) throws ServletException {
+        // Валидация пользователя
         userValidation.validate(user, result);
-        System.out.println("Received user: " + user.getUsername() + ", " + user.getPassword());
 
+        // Проверка на пустое поле password
+        if (user.getPassword().isEmpty()) {
+            result.rejectValue("password", "", "Password field should not be empty");
+        }
 
-        if(result.hasErrors()) {
+        // Проверка формата email
+        if (!userValidation.validateEmailField(user.getUsername())) {
+            result.rejectValue("username", "", "Invalid email format. Please provide a valid email.");
+        }
+
+        if (result.hasErrors()) {
             return "registration";
         }
+
         try {
             userService.createUser(user.getUsername(), user.getPassword());
         } catch (jakarta.validation.ConstraintViolationException e) {
-            result.rejectValue("username", "", "Invalid email format. Please provide a valid email.");
+            result.rejectValue("username", "", "User with this email already exists.");
             return "registration";
         }
-        authenticateUser(user,request);
+        authenticateUser(user, request);
         fileService.createInitialUserFolder(user.getId());
+
         return "redirect:/hello";
     }
   
