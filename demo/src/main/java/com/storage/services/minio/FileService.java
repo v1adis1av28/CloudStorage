@@ -2,6 +2,7 @@ package com.storage.services.minio;
 
 
 import com.storage.dto.FileInfoDto;
+import com.storage.model.File;
 import com.storage.services.DTOService;
 import com.storage.services.StringOperation;
 import io.minio.*;
@@ -53,35 +54,35 @@ public class FileService {
     }
 
 
-    public void uploadFile( String folderPath, InputStream inStream, String fileName, String contentType)
+    public void uploadFile(File file)
             throws ServerException, InsufficientDataException, ErrorResponseException,
             IOException, NoSuchAlgorithmException, InvalidKeyException,
             InvalidResponseException, XmlParserException, InternalException {
 
-        if (inStream == null) {
+        if (file.getInputStream() == null) {
             throw new IllegalArgumentException("InputStream не может быть null.");
         }
 
-        if (fileName == null || fileName.isEmpty()) {
+        if (file == null || file.getFileName().isEmpty()) {
             throw new IllegalArgumentException("Имя файла не может быть пустым.");
         }
         Path tempFile = Files.createTempFile(
-                fileName.substring(0, fileName.lastIndexOf('.')),
-                fileName.substring(fileName.lastIndexOf('.'))
+                file.getFileName().substring(0, file.getFileName().lastIndexOf('.')),
+                file.getFileName().substring(file.getFileName().lastIndexOf('.'))
         );
 
-        try (InputStream in = inStream) {
+        try (InputStream in = file.getInputStream()) {
             Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        String objectPath = folderPath + fileName;
+        String objectPath = file.getFolderPath() + file.getFileName();
 
         minioClient.uploadObject(
                 UploadObjectArgs.builder()
                         .bucket(ROOT_BUCKET)
                         .object(objectPath)
                         .filename(tempFile.toString())
-                        .contentType(contentType != null ? contentType : "application/octet-stream")
+                        .contentType(file.getContentType() != null ? file.getContentType() : "application/octet-stream")
                         .build()
         );
 

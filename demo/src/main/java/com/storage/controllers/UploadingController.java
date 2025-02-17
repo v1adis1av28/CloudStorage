@@ -1,6 +1,7 @@
 package com.storage.controllers;
 
 import com.storage.exceptions.PermissionDeniedException;
+import com.storage.model.File;
 import com.storage.services.StringOperation;
 import com.storage.services.UserService;
 import com.storage.services.minio.FileService;
@@ -47,7 +48,13 @@ public class UploadingController {
 
             String normalizedFolderPath = !currentPath.isEmpty() ? UriUtils.encodePath(currentPath, StandardCharsets.UTF_8.name()) : String.format(userRootFolder, userService.getCurrentUserId());
 
-            fileService.uploadFile(normalizedFolderPath, file.getInputStream(), file.getOriginalFilename(), file.getContentType());
+            File uploadingFile = File.builder()
+                    .folderPath(normalizedFolderPath)
+                    .fileName(file.getOriginalFilename())
+                    .inputStream(file.getInputStream())
+                    .contentType(file.getContentType())
+                    .build();
+            fileService.uploadFile(uploadingFile);
 
             String encodedDirectoryPath = UriUtils.encodePath(
                     normalizedFolderPath.substring(0, Math.max(0, normalizedFolderPath.lastIndexOf('/'))),
