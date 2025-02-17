@@ -82,7 +82,7 @@ public class FileOperationController {
                 throw new IllegalArgumentException("Invalid file path or new name.");
             }
             String directoryPath = fullPath.substring(0, fullPath.lastIndexOf('/'));
-            fileService.renameFile(userService.getCurrentUserId(), newName, fullPath);
+            fileService.renameFile(newName, fullPath);
             return "redirect:/hello?path=" + UriUtils.encodePath(directoryPath, StandardCharsets.UTF_8.name()) + "/";
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());

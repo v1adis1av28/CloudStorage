@@ -16,8 +16,6 @@ import java.util.List;
 @Service
 public class StringOperation {
 
-    //user-20-files/test/some/
-    //Method get folder name -> trim -> return folder path for create new folder name 
     public String trimFolderPath(String str)
     {
         if(!str.endsWith("/"))
@@ -32,7 +30,6 @@ public class StringOperation {
         return str.isBlank() || str.isEmpty();
     }
 
-//   Функция для получения путей до файлов и папок в передаваемой директории(rootPath), arrayList() все файлы по ссылке переданной в fileService checkPath
     public HashSet<String> getFileAndFolders(String rootPath, ArrayList<String> arrayList)
     {
         HashSet<String> results = new HashSet<>();
@@ -64,8 +61,6 @@ public class StringOperation {
         return results;
     }
 
-    //user-20-files/test/some/
-    //user-20-files/test/some.txt
     public String getShortFileName(String str)
     {
 

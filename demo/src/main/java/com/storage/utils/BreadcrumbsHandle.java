@@ -2,9 +2,7 @@ package com.storage.utils;
 
 
 import com.storage.model.BreadCrumb;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class BreadcrumbsHandle {
 
@@ -29,9 +27,5 @@ public class BreadcrumbsHandle {
         }
 
         return arrBc;
-    }
-
-    public static void main(String[] args) {
-        createBreadcrumbsByPath("user-files/user-20-files/testUploadFolder/test/");
     }
 }

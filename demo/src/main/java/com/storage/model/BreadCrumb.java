@@ -31,7 +31,5 @@ public class BreadCrumb {
         this.parentReference = parentReference;
         this.name = name;
     }
-
-
     public BreadCrumb() {}
 }

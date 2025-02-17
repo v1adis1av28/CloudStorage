@@ -29,12 +29,9 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    private final FileService fileOperationService;
-
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, FileService fileOperationService) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.fileOperationService = fileOperationService;
     }
 
     @Override

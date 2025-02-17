@@ -8,7 +8,6 @@ import io.minio.*;
 import io.minio.errors.*;
 import io.minio.messages.Item;
 import lombok.SneakyThrows;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +23,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 public class FileService {
@@ -91,12 +89,7 @@ public class FileService {
     }
 
 
-    public void uploadFolder(int userId, String folderPath, MultipartFile[] files) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        String userFolder = "user-" + userId + "-files/";
-//      Если фолдерПаф пустой, тогда папка загружается в рутовую папку пользователя
-//        if(folderPath == null || folderPath.isEmpty()) {
-//            throw new IllegalArgumentException("folderPath is empty");
-//        }
+    public void uploadFolder(String folderPath, MultipartFile[] files) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         for (MultipartFile file : files) {
             String filename = file.getOriginalFilename();
             String objectPath = folderPath + filename;
@@ -114,16 +107,13 @@ public class FileService {
 
     //Сперва нужно копировать файл,
     @SneakyThrows
-    public void renameFile(int userId, String newFileName, String oldFilePath) {
-        //user-20-files/test/minioLaunch
+    public void renameFile(String newFileName, String oldFilePath) {
         String pathToFile = oldFilePath.substring(0, oldFilePath.lastIndexOf('/') + 1);
-        String oldFileName = oldFilePath.substring(oldFilePath.lastIndexOf('/') + 1);
         minioClient.copyObject(CopyObjectArgs.builder()
                 .bucket(ROOT_BUCKET)
                 .object(pathToFile + newFileName)
                 .source(CopySource.builder()
                         .bucket(ROOT_BUCKET).object(oldFilePath).build()).build());
-        //call remove method
         removeFile(oldFilePath);
     }
 
@@ -138,8 +128,6 @@ public class FileService {
         if (filePath.endsWith("/")) {
             throw new IllegalArgumentException("Вы не можете скачать папку");
         }
-
-        // Retrieve the file content from MinIO
         return minioClient.getObject(
                 GetObjectArgs.builder()
                         .bucket(ROOT_BUCKET)

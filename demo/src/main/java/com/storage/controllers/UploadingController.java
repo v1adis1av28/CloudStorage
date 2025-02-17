@@ -76,7 +76,7 @@ public class UploadingController {
 
             if (currentPath.isEmpty()) {
                 String folderPath = String.format(userRootFolder, userService.getCurrentUserId());
-                fileService.uploadFolder(userService.getCurrentUserId(), folderPath, files);
+                fileService.uploadFolder(folderPath, files);
                 return "redirect:/hello?path=" + UriUtils.encodePath(folderPath, StandardCharsets.UTF_8.name());
             }
 
@@ -97,7 +97,7 @@ public class UploadingController {
                 return "redirect:/hello?path=" + encodedDirectoryPath;
             }
 
-            fileService.uploadFolder(userService.getCurrentUserId(), currentPath, files);
+            fileService.uploadFolder(currentPath, files);
         } catch (IllegalArgumentException | PermissionDeniedException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {

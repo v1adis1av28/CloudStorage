@@ -2,16 +2,11 @@ package com.storage.services;
 
 
 import com.storage.dto.FileInfoDto;
-import com.storage.model.FileInfo;
-import io.minio.messages.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 
-//Класс в котором будет проходить работа с DTO
 @Service
 public class DTOService {
 
