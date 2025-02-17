@@ -27,6 +27,11 @@ public class StringOperation {
         return str.substring(0,str.lastIndexOf("/", str.lastIndexOf("/")-1)+1);
     }
 
+    public boolean isValidInputField(String str)
+    {
+        return str.isBlank() || str.isEmpty();
+    }
+
 //   Функция для получения путей до файлов и папок в передаваемой директории(rootPath), arrayList() все файлы по ссылке переданной в fileService checkPath
     public HashSet<String> getFileAndFolders(String rootPath, ArrayList<String> arrayList)
     {

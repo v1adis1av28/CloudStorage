@@ -8,6 +8,8 @@ import io.minio.errors.*;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.storage.model.User;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -57,5 +59,17 @@ public class UserService implements UserDetailsService {
             throw new ConstraintViolationException(e.getConstraintViolations());
         }
         return "User created";
+    }
+
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) loadUserByUsername(authentication.getName());
+        return userDetails.getUser();
+    }
+
+    public int getCurrentUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails user = (CustomUserDetails)loadUserByUsername(auth.getName());
+        return user.getUser().getId();
     }
 }

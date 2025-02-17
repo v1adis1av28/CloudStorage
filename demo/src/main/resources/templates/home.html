@@ -202,6 +202,9 @@
     });
 </script>
 <div class="container-fluid">
+    <div th:if="${errorMessage != null}" class="alert alert-danger">
+        <p th:text="${errorMessage}"></p>
+    </div>
     <div class="row">
         <div class="col-md-12 main-content">
             <nav aria-label="breadcrumb text-center">

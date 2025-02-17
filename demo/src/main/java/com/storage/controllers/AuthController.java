@@ -2,23 +2,22 @@ package com.storage.controllers;
 
 import com.storage.model.User;
 import com.storage.services.UserService;
-
 import com.storage.services.minio.FileService;
 import com.storage.validation.UserValidation;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.filter.RequestContextFilter;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/auth")
@@ -59,15 +58,12 @@ public class AuthController {
     @SneakyThrows
     @PostMapping("/register")
     public String registration(@ModelAttribute("user") User user, BindingResult result, HttpServletRequest request, Model model) throws ServletException {
-        // Валидация пользователя
         userValidation.validate(user, result);
 
-        // Проверка на пустое поле password
         if (user.getPassword().isEmpty()) {
             result.rejectValue("password", "", "Password field should not be empty");
         }
 
-        // Проверка формата email
         if (!userValidation.validateEmailField(user.getUsername())) {
             result.rejectValue("username", "", "Invalid email format. Please provide a valid email.");
         }

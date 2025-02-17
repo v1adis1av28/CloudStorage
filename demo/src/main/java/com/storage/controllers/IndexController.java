@@ -4,25 +4,14 @@ import com.storage.security.CustomUserDetails;
 import com.storage.services.UserService;
 import com.storage.services.minio.FileService;
 import com.storage.utils.BreadcrumbsHandle;
-import io.minio.MinioClient;
-import io.minio.errors.*;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 @Controller
 public class IndexController {
@@ -37,10 +26,7 @@ public class IndexController {
         this.userService = userService;
     }
     //Todo
-    // (refactoring)Подумать над изменением формата файлов, например сделать регулярное выражение чтобы не менялось расширение
     // 5) Рефакторинг кода + чистка
-    // 5.2 убрать в чужих папки кнопки для менеджмента
-    // 5.3 При переименововании делать проверку на пустое название
     // 5.4 Оповещение о ошибке (хотелось бы в модальное окно)
     // 6) Докер компоуз
 
@@ -52,7 +38,7 @@ public class IndexController {
         }
 
         String currentPath = (path == null || path.isEmpty()) ? "" : path;
-        String userRoot = String.format(userRootFolder, getCurrentUser().getUser().getId());
+        String userRoot = String.format(userRootFolder, userService.getCurrentUserId());
         if (path != null) {
             model.addAttribute("chain", BreadcrumbsHandle.createBreadcrumbsByPath(path));
             model.addAttribute("path", path);
@@ -61,18 +47,12 @@ public class IndexController {
             model.addAttribute("chain", BreadcrumbsHandle.createBreadcrumbsByPath(userRoot));
             model.addAttribute("files", fileService.getFolderObjects(userRoot));
         }
-       // в хтмлке убрть для чужих элементов кнопки управления
         model.addAttribute("rootFolderPath", userRoot);
         model.addAttribute("currentPath", currentPath);
-        model.addAttribute("User", getCurrentUser());
+        model.addAttribute("User", userService.getCurrentUser());
         return "home";
     }
 
-    //Требуется перенос в userservice
-    private CustomUserDetails getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails user = (CustomUserDetails) userService.loadUserByUsername(auth.getName());
-        return user;
-    }
+
 
 }
