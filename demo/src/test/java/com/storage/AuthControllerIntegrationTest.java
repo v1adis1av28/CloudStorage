@@ -28,9 +28,9 @@ public class AuthControllerIntegrationTest {
     @Container
     private static final PostgreSQLContainer<?> postgresContainer =
             new PostgreSQLContainer<>("postgres:15")
-                    .withDatabaseName("testdb")
-                    .withUsername("testuser")
-                    .withPassword("testpassword");
+                    .withDatabaseName("CloudStorageTest")
+                    .withUsername("postgres")
+                    .withPassword("vlad");
 
     @BeforeEach
     void setUp() {
@@ -42,14 +42,14 @@ public class AuthControllerIntegrationTest {
 
     @Test
     void testRegistrationWithFormData() throws Exception {
+        String uniqueEmail = "testuser" + System.currentTimeMillis() + "@example.com";
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .param("username", "testuser2@example.com")
-                        .param("password", "password123"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/hello"));
+                        .param("username", uniqueEmail) // Уникальный email
+                        .param("password", "password123")) // Непустой пароль
+                .andExpect(status().is3xxRedirection()) // Проверяем статус ред
+                .andExpect(redirectedUrl("/hello"));     // Проверяем URL редиректа
     }
-
 
     @Test
     void testRegistrationWithInvalidEmail() throws Exception {

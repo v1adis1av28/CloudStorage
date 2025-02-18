@@ -1,9 +1,6 @@
 package com.storage.model;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 public class BreadCrumb {

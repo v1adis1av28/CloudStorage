@@ -106,7 +106,6 @@ public class FileService {
         }
     }
 
-    //Сперва нужно копировать файл,
     @SneakyThrows
     public void renameFile(String newFileName, String oldFilePath) {
         String pathToFile = oldFilePath.substring(0, oldFilePath.lastIndexOf('/') + 1);

@@ -2,7 +2,6 @@ package com.storage.controllers;
 
 import com.storage.exceptions.ImpossibleToChangeException;
 import com.storage.exceptions.PermissionDeniedException;
-import com.storage.security.CustomUserDetails;
 import com.storage.services.StringOperation;
 import com.storage.services.UserService;
 import com.storage.services.minio.FileService;
@@ -12,8 +11,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
