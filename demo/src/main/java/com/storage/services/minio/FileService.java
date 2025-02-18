@@ -10,6 +10,7 @@ import io.minio.errors.*;
 import io.minio.messages.Item;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,7 +29,8 @@ import java.util.List;
 @Service
 public class FileService {
 
-    private String ROOT_BUCKET = "user-files";
+    @Value("${minio.bucket}")
+    private String ROOT_BUCKET;
     private final MinioClient minioClient;
     private final StringOperation stringOperation;
     private final DTOService dtoService;

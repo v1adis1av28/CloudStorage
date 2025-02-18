@@ -1,14 +1,18 @@
 package com.storage.config;
 
 import io.minio.MinioClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MinioConfig {
 
-    private String endpoint = "http://127.0.0.1:9000";
+    @Value("${minio.endPoint}")
+    private String endpoint;
+    @Value("${minio.username}")
     private String userName = "minioadmin";
+    @Value("${minio.password}")
     private String password = "minioadmin";
 
     @Bean
