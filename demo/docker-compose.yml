@@ -10,7 +10,9 @@ services:
     command: java -jar /app.jar
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - DB_HOST=db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://:5432/CloudStorage
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=vlad
       - REDIS_HOST=redis
       - MINIO_HOST=minio
     depends_on:
@@ -23,8 +25,10 @@ services:
   db:
     image: postgres:15
     container_name: cloud-storage-db
-    env_file:
-      - src/main/resources/application.properties
+    environment:
+      - POSTGRES_DB=CloudStorage
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=vlad
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
