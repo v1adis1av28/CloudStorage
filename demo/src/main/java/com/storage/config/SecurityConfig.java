@@ -65,13 +65,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authRequest -> authRequest
                         .requestMatchers("/auth/registration", "/auth/register", "/auth/login","/js/**", "/css/**")
                         .permitAll()
-                        .requestMatchers("/hello").hasAnyAuthority("user")
+                        .requestMatchers("/").hasAnyAuthority("user")
                         .requestMatchers("/auth/admin").hasAuthority("admin")
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginProcessingUrl("/process_login")
                         .loginPage("/auth/login")
-                        .defaultSuccessUrl("/hello",true)
+                        .defaultSuccessUrl("/",true)
                         .failureUrl("/auth/login?error")
                         .permitAll())
                 .logout(logout -> logout

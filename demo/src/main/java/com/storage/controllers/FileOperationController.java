@@ -46,13 +46,13 @@ public class FileOperationController {
             if (directoryPath.isEmpty()) {
                 directoryPath = String.format(userRoot, userService.getCurrentUserId());
             }
-            return "redirect:/hello?path=" + UriUtils.encodePath(directoryPath, StandardCharsets.UTF_8.name()) + "/";
+            return "redirect:/?path=" + UriUtils.encodePath(directoryPath, StandardCharsets.UTF_8.name()) + "/";
         } catch (PermissionDeniedException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/hello?path=" + UriUtils.encodePath(fullPath, StandardCharsets.UTF_8.name());
+            return "redirect:/?path=" + UriUtils.encodePath(fullPath, StandardCharsets.UTF_8.name());
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "An unexpected error occurred while deleting the file.");
-            return "redirect:/hello?path=" + UriUtils.encodePath(fullPath, StandardCharsets.UTF_8.name());
+            return "redirect:/?path=" + UriUtils.encodePath(fullPath, StandardCharsets.UTF_8.name());
         }
     }
 
@@ -80,13 +80,13 @@ public class FileOperationController {
             }
             String directoryPath = fullPath.substring(0, fullPath.lastIndexOf('/'));
             fileService.renameFile(newName, fullPath);
-            return "redirect:/hello?path=" + UriUtils.encodePath(directoryPath, StandardCharsets.UTF_8.name()) + "/";
+            return "redirect:/?path=" + UriUtils.encodePath(directoryPath, StandardCharsets.UTF_8.name()) + "/";
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/hello?path=" + UriUtils.encodePath(fullPath, StandardCharsets.UTF_8.name());
+            return "redirect:/?path=" + UriUtils.encodePath(fullPath, StandardCharsets.UTF_8.name());
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "An unexpected error occurred while renaming the file.");
-            return "redirect:/hello?path=" + UriUtils.encodePath(fullPath, StandardCharsets.UTF_8.name());
+            return "redirect:/?path=" + UriUtils.encodePath(fullPath, StandardCharsets.UTF_8.name());
         }
     }
     @PostMapping("/deleteFolder")
@@ -102,11 +102,11 @@ public class FileOperationController {
             redirectAttributes.addFlashAttribute("successMessage", "Folder removed successfully");
 
             String encodedDirectoryPath = UriUtils.encodePath(pathToRedirect, StandardCharsets.UTF_8.name());
-            return "redirect:/hello?path=" + encodedDirectoryPath + "/";
+            return "redirect:/?path=" + encodedDirectoryPath + "/";
         }
         catch (ImpossibleToChangeException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/hello?path=" + UriUtils.encodePath(folderPath, StandardCharsets.UTF_8.name());
+            return "redirect:/?path=" + UriUtils.encodePath(folderPath, StandardCharsets.UTF_8.name());
         }
     }
 
@@ -120,10 +120,10 @@ public class FileOperationController {
             fileService.renameFolder(fullPath, newName);
 
             String encodedDirectoryPath = UriUtils.encodePath(redirect, StandardCharsets.UTF_8.name());
-            return "redirect:/hello?path=" + encodedDirectoryPath;
+            return "redirect:/?path=" + encodedDirectoryPath;
         } catch (ImpossibleToChangeException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/hello?path=" + UriUtils.encodePath(fullPath, StandardCharsets.UTF_8.name());
+            return "redirect:/?path=" + UriUtils.encodePath(fullPath, StandardCharsets.UTF_8.name());
         }
     }
 

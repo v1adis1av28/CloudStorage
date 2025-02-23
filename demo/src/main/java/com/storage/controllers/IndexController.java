@@ -27,7 +27,7 @@ public class IndexController {
     // 6) Докер компоуз
 
     @SneakyThrows
-    @GetMapping(value = "/hello")
+    @GetMapping(value = "/")
     public String index(@RequestParam(value = "path", required = false) String path, Model model) {
         if (path != null && path.startsWith("/")) {
             path = path.substring(1);

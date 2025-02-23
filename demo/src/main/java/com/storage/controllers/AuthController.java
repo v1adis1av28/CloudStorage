@@ -40,7 +40,7 @@ public class AuthController {
         if(authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return "login";
         }
-        return "redirect:/hello";
+        return "redirect:/";
     }
 
     @GetMapping("/registration")
@@ -52,7 +52,7 @@ public class AuthController {
             return "registration";
         }
 
-        return "redirect:/hello";
+        return "redirect:/";
     }
 
     @SneakyThrows
@@ -81,7 +81,7 @@ public class AuthController {
         authenticateUser(user, request);
         fileService.createInitialUserFolder(user.getId());
 
-        return "redirect:/hello";
+        return "redirect:/";
     }
   
     private void authenticateUser(User user, HttpServletRequest request) throws ServletException {

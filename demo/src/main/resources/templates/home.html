@@ -151,7 +151,7 @@
     <nav class="navbar navbar-expand-lg navbar-light container-fluid">
         <div class="container-fluid">
             <!-- Логотип -->
-            <a class="navbar-brand" th:href="@{/hello}">
+            <a class="navbar-brand" th:href="@{/}">
                 Cloud Storage
             </a>
 
@@ -165,7 +165,7 @@
                 <!-- Левая часть меню -->
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/hello}">Главная</a>
+                        <a class="nav-link" th:href="@{/}">Главная</a>
                     </li>
                 </ul>
 
@@ -213,7 +213,7 @@
                         <span th:if="${link.getParentReference() == currentPath}" th:text="${link.getName()}"></span>
 
                         <a th:if="${link.getParentReference() != currentPath}"
-                           th:href="@{/hello(path=${link.getParentReference()})}"
+                           th:href="@{/(path=${link.getParentReference()})}"
                            th:text="${link.getName()}"></a>
                     </li>
                 </ol>
@@ -223,7 +223,7 @@
                     <div class="card">
                         <div>
                             <div th:if="${file.getFullPath().endsWith('/')}">
-                                <a th:href="@{/hello(path=${currentPath == '' ? file.getFullPath() : currentPath + file.getShortName()})}">
+                                <a th:href="@{/(path=${currentPath == '' ? file.getFullPath() : currentPath + file.getShortName()})}">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-folder" viewBox="0 0 16 16">
                                         <path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a2 2 0 0 1 .342-1.31z"/>
                                     </svg>

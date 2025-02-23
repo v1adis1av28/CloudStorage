@@ -43,7 +43,7 @@ public class UploadingController {
 
             if (file == null || file.isEmpty()) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Файл не выбран или пустой.");
-                return "redirect:/hello?path=" + UriUtils.encodePath(currentPath, StandardCharsets.UTF_8.name());
+                return "redirect:/?path=" + UriUtils.encodePath(currentPath, StandardCharsets.UTF_8.name());
             }
 
             String normalizedFolderPath = !currentPath.isEmpty() ? UriUtils.encodePath(currentPath, StandardCharsets.UTF_8.name()) : String.format(userRootFolder, userService.getCurrentUserId());
@@ -60,20 +60,20 @@ public class UploadingController {
                     normalizedFolderPath.substring(0, Math.max(0, normalizedFolderPath.lastIndexOf('/'))),
                     StandardCharsets.UTF_8.name()
             );
-            return "redirect:/hello?path=" + encodedDirectoryPath + "/";
+            return "redirect:/?path=" + encodedDirectoryPath + "/";
 
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/hello?path=" + UriUtils.encodePath(currentPath, StandardCharsets.UTF_8.name());
+            return "redirect:/?path=" + UriUtils.encodePath(currentPath, StandardCharsets.UTF_8.name());
         }
         catch (PermissionDeniedException e)
         {
             redirectAttributes.addFlashAttribute("errorMessage", "У вас нет доступа к изменению этой папки");
-            return "redirect:/hello?path=" + UriUtils.encodePath(currentPath, StandardCharsets.UTF_8.name());
+            return "redirect:/?path=" + UriUtils.encodePath(currentPath, StandardCharsets.UTF_8.name());
         }
         catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Произошла ошибка при загрузке файла: " + e.getMessage());
-            return "redirect:/hello?path=" + UriUtils.encodePath(currentPath, StandardCharsets.UTF_8.name());
+            return "redirect:/?path=" + UriUtils.encodePath(currentPath, StandardCharsets.UTF_8.name());
         }
     }
 
@@ -84,7 +84,7 @@ public class UploadingController {
             if (currentPath.isEmpty()) {
                 String folderPath = String.format(userRootFolder, userService.getCurrentUserId());
                 fileService.uploadFolder(folderPath, files);
-                return "redirect:/hello?path=" + UriUtils.encodePath(folderPath, StandardCharsets.UTF_8.name());
+                return "redirect:/?path=" + UriUtils.encodePath(folderPath, StandardCharsets.UTF_8.name());
             }
 
             if (!stringOperation.rightsVerification(currentPath, String.format(userRootFolder, userService.getCurrentUserId()))) {
@@ -101,7 +101,7 @@ public class UploadingController {
                 }
                 fileService.createEmptyFolder(userService.getCurrentUserId(), currentPath);
                 String encodedDirectoryPath = UriUtils.encodePath(currentPath.substring(0, currentPath.lastIndexOf('/')), StandardCharsets.UTF_8.name());
-                return "redirect:/hello?path=" + encodedDirectoryPath;
+                return "redirect:/?path=" + encodedDirectoryPath;
             }
 
             fileService.uploadFolder(currentPath, files);
@@ -110,7 +110,7 @@ public class UploadingController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Произошла ошибка при загрузке папки: " + e.getMessage());
         }
-        return "redirect:/hello?path=" + UriUtils.encodePath(currentPath, StandardCharsets.UTF_8.name());
+        return "redirect:/?path=" + UriUtils.encodePath(currentPath, StandardCharsets.UTF_8.name());
     }
 
 }

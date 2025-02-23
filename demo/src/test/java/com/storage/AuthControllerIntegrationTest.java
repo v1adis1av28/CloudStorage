@@ -49,7 +49,7 @@ public class AuthControllerIntegrationTest {
                         .param("username", uniqueEmail) // Уникальный email
                         .param("password", "password123")) // Непустой пароль
                 .andExpect(status().is3xxRedirection()) // Проверяем статус ред
-                .andExpect(redirectedUrl("/hello"));     // Проверяем URL редиректа
+                .andExpect(redirectedUrl("/"));     // Проверяем URL редиректа
     }
 
     @Test
@@ -100,6 +100,6 @@ public class AuthControllerIntegrationTest {
                         .param("username", "testuser2@example.com")
                         .param("password", "password123"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/hello"));
+                .andExpect(redirectedUrl("/"));
     }
 }
