@@ -60,7 +60,7 @@
 - REDIS_HOST=redis
 - MINIO_HOST=minio
 - POSTGRES_USER=postgres
-- POSTGRES_PASSWORD=vlad
+- POSTGRES_PASSWORD=postgres
 - POSTGRES_DB=CloudStorage
 - MINIO_ROOT_USER=minioadmin
 - MINIO_ROOT_PASSWORD=minioadmin
