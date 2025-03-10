@@ -1,7 +1,6 @@
 package com.storage.repositories;
 
 import com.storage.model.User;
-import com.storage.security.CustomUserDetails;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -12,11 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
+import java.util.regex.Pattern;
 
 @Component
 public class UserValidation implements Validator {
 
     private final UserService userService;
+    public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
+            Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
     @Autowired
     public UserValidation(UserService userService) {
@@ -31,16 +34,21 @@ public class UserValidation implements Validator {
 
     @Override
     public void validate(Object target, Errors errors) {
-
         User user = (User) target;
+
         try {
             userService.loadUserByUsername(user.getUsername());
-        } catch(UsernameNotFoundException e)
-        {
-            return ; // Значит валидация прошла
+            errors.rejectValue("username", "", "User with this email already exists.");
+        } catch (UsernameNotFoundException ignored) {
         }
 
-        errors.rejectValue("username", "", "User with this email already exists");
+        if (!validateEmailField(user.getUsername())) {
+            errors.rejectValue("username", "", "Invalid email format. Please provide a valid email.");
+        }
+    }
+
+    public boolean validateEmailField(String email) {
+        return VALID_EMAIL_ADDRESS_REGEX.matcher(email).matches();
     }
 
 }

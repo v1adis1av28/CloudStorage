@@ -1,0 +1,16 @@
+# Используем Alpine Linux как базовый образ
+FROM alpine:latest
+
+# Устанавливаем MinIO Client (mc)
+RUN apk add --no-cache curl && \
+    curl -s https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/local/bin/mc && \
+    chmod +x /usr/local/bin/mc
+
+# Копируем скрипт инициализации
+COPY create-bucket.sh /create-bucket.sh
+
+# Установка прав на выполнение скрипта
+RUN chmod +x /create-bucket.sh
+
+# Запускаем скрипт при старте контейнера
+CMD ["/create-bucket.sh"]
