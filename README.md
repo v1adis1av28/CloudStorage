@@ -53,9 +53,9 @@
     cd CloudStorage && cd demo
     ```
 3. **Создайте файл .env и добавьте в него значения**:
-4.  ```bash
+   ```
    sudo nano .env
-    ```
+   ```
 - SPRING_PROFILES_ACTIVE=prod
 - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/CloudStorage
 - SPRING_DATASOURCE_USERNAME=postgres
