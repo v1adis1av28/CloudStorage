@@ -11,9 +11,9 @@ public class MinioConfig {
     @Value("${minio.endPoint}")
     private String endpoint;
     @Value("${minio.username}")
-    private String userName = "minioadmin";
+    private String userName;
     @Value("${minio.password}")
-    private String password = "minioadmin";
+    private String password;
 
     @Bean
     public MinioClient minioClient() {
