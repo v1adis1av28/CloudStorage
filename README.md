@@ -53,6 +53,9 @@
     cd CloudStorage && cd demo
     ```
 3. **Создайте файл .env и добавьте в него значения**:
+4.  ```bash
+   sudo nano .env
+    ```
 - SPRING_PROFILES_ACTIVE=prod
 - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/CloudStorage
 - SPRING_DATASOURCE_USERNAME=postgres
@@ -64,7 +67,9 @@
 - POSTGRES_DB=CloudStorage
 - MINIO_ROOT_USER=minioadmin
 - MINIO_ROOT_PASSWORD=minioadmin
-
+   ```
+   Ctrl+x -> Ctrl+Y
+   ```
 4. **Запустите проект с помощью Docker Compose**:
     ```
     docker-compose up --build
